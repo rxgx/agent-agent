@@ -26,21 +26,25 @@ is a ToS and ban-risk problem — don't.
 
 ## Current state
 
-Static view only. The loadout is hardcoded in `data/loadouts/sample.ts` and
-rendered by `app/page.tsx`. Nothing is editable, nothing persists.
+Editable, but nothing persists. `data/loadouts/sample.ts` is the starting
+loadout; slot pickers let you change gear brand/set, skills and specialization,
+and the set bonuses re-resolve live. A reload restores the sample.
 
 ```
 app/layout.tsx                 fonts + html shell
-app/page.tsx                   renders the sample loadout
+app/page.tsx                   mounts the editor with the sample loadout
 app/globals.css                all styling
+components/LoadoutEditor.tsx   picker state, renders the screen below
 components/LoadoutScreen.tsx   page composition
 components/Slots.tsx           gear / weapon / skill cards
+components/SlotPickers.tsx     gear / skill / specialization selects
 data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
 data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
 data/skills.ts                 skill platforms, variants, specs     (generated)
-data/loadouts/sample.ts        the hardcoded loadout
+data/loadouts/sample.ts        the starting loadout
 lib/types.ts                   loadout schema
 lib/setBonuses.ts              piece counting and bonus unlocking
+lib/loadoutEdits.ts            pure loadout transforms used by the pickers
 lib/brandMarks.ts              generated monograms + tone classification
 scripts/build-data.mjs         regenerates the three data files
 ```
@@ -132,15 +136,18 @@ each tier active or locked. Two rules are worth knowing:
   title update — community sources disagree, and upstream lists only one Decoy
   variant. Everything above them in `data/skills.ts` is stable.
 - Weapon damage figures in the sample are illustrative, not rolled.
+- The pickers cover gear source, skills and specialization only. Weapons are not
+  pickable — no weapon data is generated into `data/` yet — and named gear
+  cannot be chosen, so changing a slot always yields a generic piece.
 
 ## Next steps, in order
 
-1. Replace the hardcoded loadout with slot pickers backed by `data/brands.ts`
-   and `data/gearSets.ts`. `lib/types.ts` already has the shape an import layer
-   would target.
-2. Persist to `localStorage`, plus JSON import/export. Read
+1. Persist to `localStorage`, plus JSON import/export. Read
    `Division2-Loadout/ui` first — it solved exactly this and its README is
    honest about scope.
+2. Cover `lib/setBonuses.ts`, `lib/loadoutEdits.ts` and `lib/brandMarks.ts` with
+   tests and run them in CI. Now that pickers make every gear combination
+   reachable, the bonus maths is exercised by inputs nobody hand-checked.
 3. Pin `scripts/build-data.mjs` to an upstream commit or tag rather than `main`,
    and check the emitted files' diff on each bump.
 4. Only then consider OCR of inventory screenshots. The item detail panel is
