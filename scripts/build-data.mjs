@@ -30,7 +30,8 @@ const clean = (s) =>
 
 /** Talent names only — see handoff: descriptions belong behind a data pipeline. */
 const talentName = (s) => {
-  const first = clean((s ?? "").split("\n")[0]);
+  const firstLine = clean((s ?? "").split("\n")[0]);
+  const first = clean((firstLine ?? "").split(":")[0]);
   return first || null;
 };
 
