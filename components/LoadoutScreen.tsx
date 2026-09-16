@@ -1,4 +1,5 @@
 import { SPECIALIZATIONS_BY_ID } from "@/data/skills";
+import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import { hasWildcard, resolveSets, type ActiveSet } from "@/lib/setBonuses";
 import type { GearSlot, Loadout, WeaponSlot } from "@/lib/types";
 import {
@@ -23,10 +24,19 @@ const WEAPON_ORDER: readonly WeaponSlot[] = ["primary", "secondary", "sidearm"];
 
 const SetPanel = ({ set }: { set: ActiveSet }) => {
   const wildcards = set.counted - set.equipped;
+  const mark =
+    set.kind === "gearSet"
+      ? GEAR_SET_MARKS.get(set.id)
+      : BRAND_MARKS.get(set.id);
 
   return (
     <div className={`set is-${set.kind}`}>
       <div className="set-head">
+        {mark ? (
+          <span className={`mark tone-${mark.tone}`} aria-hidden="true">
+            {mark.monogram}
+          </span>
+        ) : null}
         <span className="set-name">{set.name}</span>
         <span className="set-count">
           {set.equipped}

@@ -41,6 +41,7 @@ data/skills.ts                 skill platforms, variants, specs     (generated)
 data/loadouts/sample.ts        the hardcoded loadout
 lib/types.ts                   loadout schema
 lib/setBonuses.ts              piece counting and bonus unlocking
+lib/brandMarks.ts              generated monograms + tone classification
 scripts/build-data.mjs         regenerates the three data files
 ```
 
@@ -83,6 +84,30 @@ script, so they survive the next regeneration.
   Items are identified by rarity color, a core-attribute pip, and text. Tools
   that can extract assets exist (Hunter by dtzxporter, SnowplowCLI) but the
   output should not be committed.
+
+## Identity marks
+
+The real in-game brand logos are Ubisoft's, so `lib/brandMarks.ts` generates a
+stand-in for each set: a monogram derived from the set's name, tinted by what
+that set's own bonus lines actually do.
+
+Each bonus line is scored against three vocabularies — offensive, defensive,
+skill — and the set takes the majority. Skill phrases are matched first, so
+`Skill Damage` and `Repair Skills` classify as skill rather than being caught by
+the word "Damage". A line matching nothing abstains rather than voting, and a
+tie breaks offensive.
+
+Across all 65 sets (37 brands + 28 gear sets) this currently comes out
+**33 offensive / 12 defensive / 20 skill**. `toneDistribution()` recomputes it,
+which is the cheapest sanity check after a data regeneration.
+
+Monograms are not unique — `Tip of the Spear` and `Tipping Scales` both give
+`TS`. That is fine: a mark is always rendered next to the set's full name, so it
+is decoration, never an identifier.
+
+This lives in `lib/` rather than `data/` on purpose. `data/` is overwritten
+wholesale by `scripts/build-data.mjs`, so anything stored alongside it would be
+clobbered on the next run.
 
 ## Set bonus rules
 
