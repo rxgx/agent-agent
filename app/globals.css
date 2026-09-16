@@ -472,3 +472,55 @@ body {
     padding: 16px 12px 48px;
   }
 }
+
+/* ---- generated identity marks ---------------------------------------- */
+
+/*
+ * Stands in for the brand logo, which is Ubisoft's. A monogram derived from
+ * the set name, tinted by what that set's own bonus lines do. See
+ * lib/brandMarks.ts.
+ */
+.mark {
+  --tone: var(--text-faint);
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--tone);
+  border: 1px solid var(--tone);
+  background: color-mix(in srgb, var(--tone) 10%, transparent);
+  clip-path: polygon(
+    0 0,
+    calc(100% - 6px) 0,
+    100% 6px,
+    100% 100%,
+    6px 100%,
+    0 calc(100% - 6px)
+  );
+}
+
+.tone-offensive { --tone: #e06a4a; }
+.tone-defensive { --tone: #4a90c4; }
+.tone-skill { --tone: #c9a227; }
+
+.item-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.item-head > div {
+  min-width: 0;
+}
+
+.set-head .mark {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}

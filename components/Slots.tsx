@@ -1,4 +1,5 @@
 import { BRANDS_BY_ID } from "@/data/brands";
+import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
 import { SKILL_PLATFORMS_BY_ID } from "@/data/skills";
 import type {
@@ -67,11 +68,27 @@ export const GearCard = ({ piece }: { piece: GearPiece }) => {
   const subtitle = piece.name ? source : undefined;
   const plain = !piece.name && piece.rarity !== "exotic";
 
+  // Generated stand-in for the brand logo; see lib/brandMarks.ts.
+  const mark = piece.gearSetId
+    ? GEAR_SET_MARKS.get(piece.gearSetId)
+    : piece.brandId
+      ? BRAND_MARKS.get(piece.brandId)
+      : undefined;
+
   return (
     <article className={`item rarity-${piece.rarity}`}>
       <div className="item-slot">{GEAR_SLOT_LABELS[piece.slot]}</div>
-      <h3 className={`item-name${plain ? " is-plain" : ""}`}>{title}</h3>
-      {subtitle ? <div className="item-sub">{subtitle}</div> : null}
+      <div className="item-head">
+        {mark ? (
+          <span className={`mark tone-${mark.tone}`} aria-hidden="true">
+            {mark.monogram}
+          </span>
+        ) : null}
+        <div>
+          <h3 className={`item-name${plain ? " is-plain" : ""}`}>{title}</h3>
+          {subtitle ? <div className="item-sub">{subtitle}</div> : null}
+        </div>
+      </div>
       <Core core={piece.core} />
       <AttributeList items={piece.attributes} />
       {piece.talent ? <div className="talent">{piece.talent}</div> : null}
