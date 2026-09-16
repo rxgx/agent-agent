@@ -1,0 +1,139 @@
+# Division 2 Character View
+
+A read-only character screen for The Division 2 — equipped gear, weapons,
+skills, specialization, and which set bonuses are live.
+
+Next.js 15 App Router, React 19, TypeScript, plain CSS, no framework. Deploys
+to Vercel with zero config.
+
+```bash
+npm install
+npm run dev      # http://localhost:3000
+```
+
+## The constraint that shapes everything
+
+**There is no Ubisoft inventory API.** Bungie exposes endpoints that let
+Destiny Item Manager read your inventory and move items between characters and
+vault; Ubisoft has no equivalent for Division 2. The only public API is
+tracker.gg's, which serves career stats and player lookup — no items, no stash,
+no transfers.
+
+So the two features that define DIM are permanently off the table. Everything
+here is hand-entered or, eventually, OCR'd from screenshots. Don't go looking
+for an API; it does not exist. Reading game memory or injecting into the process
+is a ToS and ban-risk problem — don't.
+
+## Current state
+
+Static view only. The loadout is hardcoded in `data/loadouts/sample.ts` and
+rendered by `app/page.tsx`. Nothing is editable, nothing persists.
+
+```
+app/layout.tsx                 fonts + html shell
+app/page.tsx                   renders the sample loadout
+app/globals.css                all styling
+components/LoadoutScreen.tsx   page composition
+components/Slots.tsx           gear / weapon / skill cards
+data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
+data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
+data/skills.ts                 skill platforms, variants, specs     (generated)
+data/loadouts/sample.ts        the hardcoded loadout
+lib/types.ts                   loadout schema
+lib/setBonuses.ts              piece counting and bonus unlocking
+scripts/build-data.mjs         regenerates the three data files
+```
+
+## Data
+
+The three `data/*.ts` reference files are generated, not hand-entered:
+
+```bash
+node scripts/build-data.mjs
+```
+
+It pulls the emitted JSON from [knowlesy/division-config][kc] (MIT) — which does
+extract → patch overlay → validate → emit from the community build spreadsheet —
+and narrows it to the fields this view renders. Currently pinned to whatever
+upstream's `main` holds; at time of writing that is patch **Y8S3 / TU30 / 2.34**.
+
+A title update is therefore a re-run, not a re-read of a guide. Do not edit the
+generated files by hand; change the script.
+
+Upstream carries occasional spreadsheet typos in talent and passive names
+(`Emegency Cleanse`, `Siganture`). These are reproduced faithfully rather than
+silently patched — corrections belong upstream, or in a local overlay in the
+script, so they survive the next regeneration.
+
+[kc]: https://github.com/knowlesy/division-config
+
+## Design decisions
+
+- **Rarity is a 3px left-edge stripe**, not a border or background tint. It's
+  the only place color carries meaning, so nothing competes with it. Named and
+  exotic items also get the chevron watermark the game uses, drawn in CSS.
+- **The angular corner cut** is a single `clip-path` on `.panel` and `.item` in
+  `globals.css`. That's the whole visual signature; everything else stays flat.
+  `--cut` controls it.
+- **Talent names only, no talent text.** Full descriptions are long, change
+  every title update, and belong behind a data pipeline rather than the view
+  layer.
+- **No icons.** There is no distributable icon set for this game. Extracted
+  game textures are Ubisoft's IP and are not safe to ship in a public repo.
+  Items are identified by rarity color, a core-attribute pip, and text. Tools
+  that can extract assets exist (Hunter by dtzxporter, SnowplowCLI) but the
+  output should not be committed.
+
+## Set bonus rules
+
+`lib/setBonuses.ts` counts equipped pieces per brand and per gear set and marks
+each tier active or locked. Two rules are worth knowing:
+
+- The **NinjaBike Messenger Backpack**'s *Resourceful* talent fulfils a
+  requirement toward every equipped gear **and** brand set simultaneously. A
+  piece flagged `countsForAllSets` adds one to every set that already has a real
+  piece equipped — it cannot start a set on its own, and it is never counted
+  twice for a set it already belongs to. The view marks the contribution `+1`.
+- **Chest and backpack gear set talents are item-bound, not count-bound.** They
+  apply when that specific slot is a piece of the set, regardless of total
+  pieces, so they are resolved per-slot rather than per-tier.
+
+## Known gaps
+
+- Attribute values (core magnitudes, secondary rolls) are hand-entered in the
+  sample. `lib/types.ts` has room for them; no source emits per-roll values.
+- Expertise, Optimization, and Prototype state are absent entirely.
+- Decoy, Trap, and Sticky Bomb variant names need verifying against the current
+  title update — community sources disagree, and upstream lists only one Decoy
+  variant. Everything above them in `data/skills.ts` is stable.
+- Weapon damage figures in the sample are illustrative, not rolled.
+
+## Next steps, in order
+
+1. Replace the hardcoded loadout with slot pickers backed by `data/brands.ts`
+   and `data/gearSets.ts`. `lib/types.ts` already has the shape an import layer
+   would target.
+2. Persist to `localStorage`, plus JSON import/export. Read
+   `Division2-Loadout/ui` first — it solved exactly this and its README is
+   honest about scope.
+3. Pin `scripts/build-data.mjs` to an upstream commit or tag rather than `main`,
+   and check the emitted files' diff on each bump.
+4. Only then consider OCR of inventory screenshots. The item detail panel is
+   high-contrast and structurally consistent, so it's tractable, and it's the
+   genuinely novel contribution — nobody has built a Division 2 stash manager.
+
+## Prior art worth reading
+
+- `Division2-Loadout/ui` — closest to this project's scope
+- `lesgloutonnes/TD2` — browser loadout planner, brands/sets/exotics/skills
+- `knowlesy/division-config` — MIT, best data pipeline
+- `faildruid/division-2-db` — item database
+- `mxswat/mx-division-builds` — the flagship community builder, but CC BY-NC-SA
+  4.0, so anything derived from it inherits non-commercial + share-alike. Avoid
+  if you want a free hand.
+
+## Legal
+
+Not affiliated with, endorsed by, or sponsored by Ubisoft. Tom Clancy's The
+Division 2 is a trademark of Ubisoft Entertainment. No game assets are
+distributed in this repository.
