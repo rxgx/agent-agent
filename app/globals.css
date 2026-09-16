@@ -1,0 +1,474 @@
+/*
+ * All styling for the character view. Plain CSS, no framework.
+ *
+ * Two rules carry the whole visual identity:
+ *   1. `.panel` gets one angular corner cut via clip-path, sized by `--cut`.
+ *   2. Rarity is a 3px left-edge stripe and nothing else.
+ * Everything else stays flat so neither has to compete for attention.
+ */
+
+:root {
+  --bg: #0b0d10;
+  --bg-panel: #14171c;
+  --bg-panel-alt: #181c22;
+  --line: #262b33;
+  --line-bright: #343b45;
+
+  --text: #e6e9ee;
+  --text-dim: #9aa3b0;
+  --text-faint: #666e7b;
+
+  --accent: #ff7a1a;
+  --accent-dim: #8a4410;
+
+  /* Rarity — the only place color means something. */
+  --r-standard: #7a8290;
+  --r-specialized: #3f8fd4;
+  --r-superior: #9b5fd0;
+  --r-high-end: #f0a030;
+  --r-gear-set: #4caf6a;
+  --r-named: #e8c565;
+  --r-exotic: #e8582a;
+
+  --cut: 14px;
+  --stripe: 3px;
+
+  --font: var(--font-sans), "Segoe UI", system-ui, sans-serif;
+  --font-mono: var(--font-mono-face), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- the corner cut ------------------------------------------------- */
+
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
+/* ---- layout --------------------------------------------------------- */
+
+.screen {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px 64px;
+}
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 20px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+}
+
+.masthead h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.masthead .agent {
+  color: var(--text-dim);
+  font-size: 13px;
+}
+
+.masthead .spacer {
+  flex: 1 1 auto;
+}
+
+.stat-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.stat-chip b {
+  display: block;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--text);
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.column-head {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding-left: 2px;
+}
+
+/* ---- item cards ----------------------------------------------------- */
+
+.item {
+  --rarity: var(--r-standard);
+  position: relative;
+  overflow: hidden;
+  padding: 10px 12px 10px 15px;
+  background: var(--bg-panel);
+  border: 1px solid var(--line);
+  border-left: var(--stripe) solid var(--rarity);
+  clip-path: polygon(
+    0 0,
+    calc(100% - var(--cut)) 0,
+    100% var(--cut),
+    100% 100%,
+    var(--cut) 100%,
+    0 calc(100% - var(--cut))
+  );
+}
+
+.item.is-empty {
+  --rarity: var(--line-bright);
+  background: transparent;
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.rarity-standard { --rarity: var(--r-standard); }
+.rarity-specialized { --rarity: var(--r-specialized); }
+.rarity-superior { --rarity: var(--r-superior); }
+.rarity-highEnd { --rarity: var(--r-high-end); }
+.rarity-gearSet { --rarity: var(--r-gear-set); }
+.rarity-named { --rarity: var(--r-named); }
+.rarity-exotic { --rarity: var(--r-exotic); }
+
+/*
+ * The chevron watermark the game uses on named items. Pure CSS, so nothing
+ * from the game's texture archives has to be shipped.
+ */
+.item.rarity-named::after,
+.item.rarity-exotic::after {
+  content: "";
+  position: absolute;
+  top: -12px;
+  right: 14px;
+  width: 54px;
+  height: 54px;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, transparent 46%, var(--rarity) 46%, var(--rarity) 54%, transparent 54%),
+    linear-gradient(135deg, transparent 66%, var(--rarity) 66%, var(--rarity) 74%, transparent 74%);
+  opacity: 0.16;
+}
+
+.item-slot {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.item-name {
+  margin: 1px 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--rarity);
+  letter-spacing: 0.01em;
+}
+
+.item-name.is-plain {
+  color: var(--text);
+}
+
+.item-sub {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+/* Core attribute: a pip plus the value, standing in for the game's icon. */
+.core {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
+}
+
+.pip {
+  flex: 0 0 auto;
+  width: 8px;
+  height: 8px;
+  background: var(--accent);
+  transform: rotate(45deg);
+}
+
+.core-name {
+  color: var(--text-dim);
+}
+
+.core-value {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.attrs {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.attrs li {
+  display: flex;
+  gap: 10px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+}
+
+.attrs .v {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+.talent {
+  margin-top: 8px;
+  font-size: 12.5px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.mods {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mods li {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: var(--text-faint);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+}
+
+/* ---- set bonuses ---------------------------------------------------- */
+
+.sets {
+  margin-top: 20px;
+  padding: 18px 20px 20px;
+}
+
+.sets h2,
+.spec h2 {
+  margin: 0 0 14px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.set-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.set {
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  border-left: var(--stripe) solid var(--line-bright);
+  padding: 10px 12px;
+}
+
+.set.is-gearSet {
+  border-left-color: var(--r-gear-set);
+}
+
+.set.is-brand {
+  border-left-color: var(--r-high-end);
+}
+
+.set-head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.set-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.set-count {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.set-count .wild {
+  color: var(--accent);
+}
+
+.tiers {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.tier {
+  display: flex;
+  gap: 8px;
+  font-size: 12.5px;
+  color: var(--text-faint);
+}
+
+.tier.is-active {
+  color: var(--text);
+}
+
+.tier .n {
+  flex: 0 0 auto;
+  font-family: var(--font-mono);
+  color: var(--text-faint);
+}
+
+.tier.is-active .n {
+  color: var(--accent);
+}
+
+.tier-effects {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.set-talents {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--line);
+  font-size: 12.5px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.footnote {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.footnote code {
+  font-family: var(--font-mono);
+  color: var(--text-dim);
+}
+
+/* ---- specialization ------------------------------------------------- */
+
+.spec {
+  margin-top: 20px;
+  padding: 18px 20px 20px;
+}
+
+.spec-name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.passives {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.passives li {
+  font-size: 12px;
+  color: var(--text-dim);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+}
+
+/* ---- provenance ----------------------------------------------------- */
+
+.colophon {
+  margin-top: 28px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--text-faint);
+}
+
+.colophon a {
+  color: var(--text-dim);
+}
+
+@media (max-width: 640px) {
+  :root {
+    --cut: 10px;
+  }
+
+  .screen {
+    padding: 16px 12px 48px;
+  }
+}
