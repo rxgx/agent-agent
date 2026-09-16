@@ -45,8 +45,8 @@ export const GEAR_SETS: readonly GearSet[] = [
     bonus2pc: ["30% Hazard Protection"],
     bonus3pc: ["40% Repair Skills"],
     talent4pc: "Charging",
-    chestTalent: "Overcharging:",
-    backpackTalent: "Safe Charging:",
+    chestTalent: "Overcharging",
+    backpackTalent: "Safe Charging",
   },
   {
     id: "concentrated-company",
@@ -84,9 +84,9 @@ export const GEAR_SETS: readonly GearSet[] = [
     coreAttribute: "Skill Tier",
     bonus2pc: ["8% Skill Efficiency"],
     bonus3pc: ["30% Status Effects"],
-    talent4pc: "Spontaneous Combustion: Every Status Effect you apply has a 40% chance to also apply Burn. If the effect applied was already Burn, the enemy takes +25% Burn Damage for its duration.",
-    chestTalent: "Flashpoint: Chance to apply Burn increases from 40% to 60%.",
-    backpackTalent: "White Hot: Increases duration of the Burn Damage debuff by +50%.",
+    talent4pc: "Spontaneous Combustion",
+    chestTalent: "Flashpoint",
+    backpackTalent: "White Hot",
   },
   {
     id: "foundry-bulwark",
