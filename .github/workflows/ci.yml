@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# A second push to a PR makes the first run irrelevant.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      # Runs before the build on purpose: it is seconds rather than minutes,
+      # and it passes on a clean checkout with no .next/ present.
+      - name: Typecheck
+        run: npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+      # `next build` rewrites next-env.d.ts. If a generated file is tracked,
+      # the build dirties the tree and the next person commits the churn.
+      # Catch that here rather than in review.
+      - name: Generated files must not drift
+        run: git diff --exit-code
