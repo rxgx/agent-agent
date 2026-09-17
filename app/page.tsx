@@ -1,6 +1,6 @@
-import { LoadoutScreen } from "@/components/LoadoutScreen";
+import { LoadoutEditor } from "@/components/LoadoutEditor";
 import { sampleLoadout } from "@/data/loadouts/sample";
 
 export default function Page() {
-  return <LoadoutScreen loadout={sampleLoadout} />;
+  return <LoadoutEditor initial={sampleLoadout} />;
 }

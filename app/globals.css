@@ -524,3 +524,103 @@ body {
   height: 22px;
   font-size: 10px;
 }
+
+/* ---- slot pickers ---------------------------------------------------- */
+
+.editor-shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 24px 16px 0;
+}
+
+.editor {
+  padding: 16px 20px 18px;
+}
+
+.editor-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.editor-head h2 {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  font-weight: 400;
+}
+
+.reset {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent-dim);
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.reset:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 10px 14px;
+}
+
+.picker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.picker-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.picker-select {
+  width: 100%;
+  min-width: 0;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--line);
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.picker-select:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.picker-select:disabled {
+  color: var(--text-faint);
+  cursor: default;
+}
+
+.picker-select.is-variant {
+  margin-top: 4px;
+}
+
+.editor-note {
+  margin: 14px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-faint);
+}
