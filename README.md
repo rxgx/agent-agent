@@ -45,6 +45,7 @@ data/loadouts/sample.ts        the starting loadout
 lib/types.ts                   loadout schema
 lib/setBonuses.ts              piece counting and bonus unlocking
 lib/loadoutEdits.ts            pure loadout transforms used by the pickers
+lib/equipRules.ts              equip restrictions (one exotic weapon, one exotic armor)
 lib/brandMarks.ts              generated monograms + tone classification
 scripts/build-data.mjs         regenerates the three data files
 ```
@@ -126,6 +127,14 @@ each tier active or locked. Two rules are worth knowing:
 - **Chest and backpack gear set talents are item-bound, not count-bound.** They
   apply when that specific slot is a piece of the set, regardless of total
   pieces, so they are resolved per-slot rather than per-tier.
+
+## Equip rules
+
+The game allows **one exotic weapon and one exotic armor piece** at a time —
+not two of either, even across weapon classes, so an exotic pistol alongside an
+exotic assault rifle is still illegal. `lib/equipRules.ts` reports violations
+rather than throwing, and the screen shows an *Illegal loadout* banner, so a
+bad import or hand-edited loadout is flagged instead of rendering as if valid.
 
 ## Known gaps
 

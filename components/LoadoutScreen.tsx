@@ -1,5 +1,6 @@
 import { SPECIALIZATIONS_BY_ID } from "@/data/skills";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
+import { findViolations } from "@/lib/equipRules";
 import { hasWildcard, resolveSets, type ActiveSet } from "@/lib/setBonuses";
 import type { GearSlot, Loadout, WeaponSlot } from "@/lib/types";
 import {
@@ -71,6 +72,7 @@ const SetPanel = ({ set }: { set: ActiveSet }) => {
 
 export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
   const sets = resolveSets(loadout);
+  const violations = findViolations(loadout);
   const spec = SPECIALIZATIONS_BY_ID.get(loadout.specializationId);
   const gearBySlot = new Map(loadout.gear.map((piece) => [piece.slot, piece]));
   const weaponsBySlot = new Map(loadout.weapons.map((w) => [w.slot, w]));
@@ -103,6 +105,20 @@ export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
           </span>
         ) : null}
       </header>
+
+      {violations.length > 0 ? (
+        <section className="violations panel" role="alert">
+          <h2>Illegal loadout</h2>
+          <ul>
+            {violations.map((v) => (
+              <li key={v.rule}>
+                Only {v.limit} {v.subject} may be equipped —{" "}
+                {v.equipped.length} are: {v.equipped.join(", ")}.
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="columns">
         <section className="column">
