@@ -624,3 +624,30 @@ body {
   line-height: 1.5;
   color: var(--text-faint);
 }
+
+/* ---- equip rule violations ------------------------------------------- */
+
+.violations {
+  --warn: #e0533a;
+  margin-bottom: 20px;
+  padding: 14px 20px;
+  border-color: color-mix(in srgb, var(--warn) 55%, var(--line));
+  border-left: var(--stripe) solid var(--warn);
+}
+
+.violations h2 {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--warn);
+  font-weight: 600;
+}
+
+.violations ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 13px;
+  color: var(--text);
+}
