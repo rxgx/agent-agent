@@ -7,6 +7,7 @@
   },
   "loadout": {
     "name": "St. Elmo's Red Striker",
+    "specializationId": "gunner",
     "gear": [
       {
         "slot": "mask",
@@ -71,6 +72,13 @@
         "name": "ACS-12",
         "type": "Shotgun",
         "rarity": "highEnd"
+      },
+      {
+        "slot": "sidearm",
+        "name": "Quickstep",
+        "type": "Pistol",
+        "rarity": "named",
+        "talent": "Sport Mode"
       }
     ],
     "skills": [
