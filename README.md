@@ -36,8 +36,9 @@ back. A reload restores the curated build.
 Weapon cards show all of a weapon's attributes. The two cores are fixed by
 weapon type (an assault rifle always has Assault Rifle Damage and Health
 Damage; a pistol has only Pistol Damage), so they are derived rather than
-stored. The third attribute is a roll, so a build stores it, and edit mode
-picks it from the 13 the game allows.
+stored, and get a filled pip. The third attribute is a roll, so a build
+stores it, and edit mode picks it from the 13 the game allows; its pip is
+outlined, since a weapon may not have one recorded.
 
 ```
 app/layout.tsx                 fonts + html shell

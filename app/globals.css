@@ -244,7 +244,14 @@ body {
   transform: rotate(45deg);
 }
 
-/* A weapon's second core sits directly under its first, sharing the rule. */
+/* A rolled attribute (a weapon's third) is optional, so its pip is outlined. */
+.pip.is-rolled {
+  box-sizing: border-box;
+  background: transparent;
+  border: 1.5px solid var(--accent);
+}
+
+/* A weapon's attributes stack directly under its first core, sharing the rule. */
 .core + .core {
   margin-top: 4px;
   padding-top: 0;

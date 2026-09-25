@@ -73,10 +73,12 @@ const AttributeList = ({ items }: { items?: readonly Attribute[] }) =>
     </ul>
   ) : null;
 
-const Core = ({ core }: { core?: Attribute }) =>
+/** `rolled` marks an attribute that varies from copy to copy: an outlined pip
+ *  rather than the filled one of a fixed core. */
+const Core = ({ core, rolled = false }: { core?: Attribute; rolled?: boolean }) =>
   core ? (
     <div className="core">
-      <span className="pip" aria-hidden="true" />
+      <span className={`pip${rolled ? " is-rolled" : ""}`} aria-hidden="true" />
       <span className="core-name">{core.name}</span>
       {core.value ? <span className="core-value">{core.value}</span> : null}
     </div>
@@ -178,7 +180,9 @@ export const WeaponSlotCard = ({
         {WEAPON_CORES[weapon.type].map((core) => (
           <Core key={core.name} core={{ name: core.name }} />
         ))}
-        <AttributeList items={weapon.attributes} />
+        {weapon.attributes?.map((attr) => (
+          <Core key={attr.name} core={attr} rolled />
+        ))}
         {weapon.talent ? <div className="talent">{weapon.talent}</div> : null}
         <Mods mods={weapon.mods} />
       </>
