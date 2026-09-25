@@ -92,8 +92,7 @@
       },
       {
         "slot": "holster",
-        "name": "Fox's Prayer",
-        "rarity": "named",
+        "rarity": "highEnd",
         "brandId": "grupo-sombra-s-a-",
         "core": {
           "name": "Weapon Damage",
@@ -104,8 +103,7 @@
             "name": "Critical Hit Damage",
             "value": "12.0%"
           }
-        ],
-        "talent": "Perfectly Opportunistic"
+        ]
       },
       {
         "slot": "kneepads",

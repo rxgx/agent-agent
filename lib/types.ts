@@ -123,3 +123,27 @@ export interface Specialization {
   readonly name: string;
   readonly passives: readonly string[];
 }
+
+/** A pickable weapon: a base high-end gun, or a named or exotic one. */
+export interface WeaponDef {
+  readonly id: string;
+  readonly name: string;
+  readonly type: WeaponType;
+  readonly rarity: "highEnd" | "named" | "exotic";
+  /** Talent name for named and exotic weapons; base weapons roll theirs. */
+  readonly talent: string | null;
+}
+
+/** A named or exotic gear piece. Generic brand and gear set pieces are built from their set. */
+export interface GearItemDef {
+  readonly id: string;
+  readonly name: string;
+  readonly slot: GearSlot;
+  readonly rarity: "named" | "exotic";
+  /** The brand a named piece counts toward; exotics belong to none. */
+  readonly brandId: string | null;
+  readonly core: string | null;
+  readonly talent: string | null;
+  /** NinjaBike's Resourceful: counts toward every equipped set at once. */
+  readonly countsForAllSets: boolean;
+}

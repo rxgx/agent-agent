@@ -27,9 +27,10 @@ is a ToS and ban-risk problem — don't.
 ## Current state
 
 Curated builds, editable, but nothing persists. Each build in `data/builds/`
-has its own page at `/builds/<id>`, and `/` shows the first one. Slot pickers
-change gear brand or set, skills and specialization, and the set bonuses
-re-resolve live. A reload restores the curated build.
+has its own page at `/builds/<id>`, and `/` shows the first one. Every slot is
+edited in place: each gear, weapon and skill card, the specialization panel and
+the build name have an **Edit** toggle, and the set bonuses re-resolve live. A
+reload restores the curated build.
 
 ```
 app/layout.tsx                 fonts + html shell
@@ -39,10 +40,11 @@ app/globals.css                all styling
 components/LoadoutEditor.tsx   picker state, renders the screen below
 components/LoadoutScreen.tsx   page composition
 components/Slots.tsx           gear / weapon / skill cards
-components/SlotPickers.tsx     gear / skill / specialization selects
+components/SlotControls.tsx    the selects shown inside a card while it is edited
 data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
 data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
 data/skills.ts                 skill platforms, variants, specs     (generated)
+data/items.ts                  390 weapons, 102 named/exotic gear   (generated)
 data/builds/*.json             curated builds, one file each
 data/builds/index.ts           build list; validates every build at build time
 lib/types.ts                   loadout schema
@@ -56,7 +58,7 @@ scripts/build-data.mjs         regenerates the three data files
 
 ## Data
 
-The three `data/*.ts` reference files are generated, not hand-entered:
+The `data/*.ts` reference files are generated, not hand-entered:
 
 ```bash
 node scripts/build-data.mjs
@@ -141,7 +143,7 @@ gear sets by id, so a display-name change never breaks a build.
 
 To add one:
 
-1. Open any build, change it with the pickers, and give it a new name.
+1. Open any build, edit its slots in place, and give it a new name.
 2. Use **Copy JSON**. A renamed build gets a new id and drops the original's
    source; an unrenamed one keeps both, so editing a curated build and copying
    it produces a replacement for that build's file.
@@ -164,6 +166,12 @@ exotic assault rifle is still illegal. `lib/equipRules.ts` reports violations
 rather than throwing, and the screen shows an *Illegal loadout* banner, so a
 bad import or hand-edited loadout is flagged instead of rendering as if valid.
 
+The slot editors apply the same rule the way the game does: once an exotic
+weapon or armor piece is equipped, the other exotics are disabled in the
+remaining slots. The equipped exotic can still be swapped for another. The
+sidearm slot offers only pistols, and the primary and secondary slots offer
+everything else.
+
 ## Known gaps
 
 - Attribute values (core magnitudes, secondary rolls) are hand-entered in the
@@ -173,9 +181,8 @@ bad import or hand-edited loadout is flagged instead of rendering as if valid.
   title update — community sources disagree, and upstream lists only one Decoy
   variant. Everything above them in `data/skills.ts` is stable.
 - Weapon damage figures in the NinjaBike demo build are illustrative, not rolled.
-- The pickers cover gear source, skills and specialization only. Weapons are not
-  pickable — no weapon data is generated into `data/` yet — and named gear
-  cannot be chosen, so changing a slot always yields a generic piece.
+- Rolled attributes, mods and weapon talents on base (non-named) weapons are
+  not editable; choosing an item sets its name, rarity, core and talent only.
 
 - **St. Elmo's Red Striker is partly transcribed.** Its gear sources,
   weapons, exotics and playstyle notes are in; its sidearm, skills,

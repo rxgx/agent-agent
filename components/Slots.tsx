@@ -1,3 +1,6 @@
+"use client";
+
+import { useState, type ReactNode } from "react";
 import { BRANDS_BY_ID } from "@/data/brands";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
@@ -11,7 +14,7 @@ import type {
   WeaponSlot,
 } from "@/lib/types";
 
-const GEAR_SLOT_LABELS: Record<GearSlot, string> = {
+export const GEAR_SLOT_LABELS: Record<GearSlot, string> = {
   mask: "Mask",
   backpack: "Backpack",
   chest: "Body Armor",
@@ -20,14 +23,77 @@ const GEAR_SLOT_LABELS: Record<GearSlot, string> = {
   kneepads: "Kneepads",
 };
 
-const WEAPON_SLOT_LABELS: Record<WeaponSlot, string> = {
+export const WEAPON_SLOT_LABELS: Record<WeaponSlot, string> = {
   primary: "Primary",
   secondary: "Secondary",
   sidearm: "Sidearm",
 };
 
-/** Named and exotic items print their own name in the rarity color; generic
- *  high-ends print the brand or set in plain text, as the game does. */
+/** The Edit / Done button a card, panel or title shows when it can be edited. */
+export const EditToggle = ({
+  label,
+  editing,
+  empty,
+  onToggle,
+}: {
+  label: string;
+  editing: boolean;
+  empty?: boolean;
+  onToggle: () => void;
+}) => (
+  <button
+    type="button"
+    className="edit-toggle"
+    aria-expanded={editing}
+    aria-label={`${editing ? "Finish editing" : empty ? "Add" : "Edit"} ${label}`}
+    onClick={onToggle}
+  >
+    {editing ? "Done" : empty ? "Add" : "Edit"}
+  </button>
+);
+
+/**
+ * Card chrome shared by every slot: the slot label, the edit toggle, and the
+ * controls while editing. Each slot renders one shell whether it is filled or
+ * empty, so emptying a slot mid-edit keeps its controls open instead of
+ * swapping in a different component and losing them.
+ */
+const SlotShell = ({
+  label,
+  rarity,
+  empty,
+  editor,
+  children,
+}: {
+  label: string;
+  rarity?: string;
+  empty: boolean;
+  editor?: ReactNode;
+  children: ReactNode;
+}) => {
+  const [editing, setEditing] = useState(false);
+
+  return (
+    <article
+      className={`item ${empty ? "is-empty" : `rarity-${rarity}`}${editing ? " is-editing" : ""}`}
+    >
+      <div className="slot-head">
+        <span className="item-slot">{label}</span>
+        {editor ? (
+          <EditToggle
+            label={label}
+            editing={editing}
+            empty={empty}
+            onToggle={() => setEditing((e) => !e)}
+          />
+        ) : null}
+      </div>
+      {editing && editor ? <div className="slot-editor">{editor}</div> : null}
+      {children}
+    </article>
+  );
+};
+
 const AttributeList = ({ items }: { items?: readonly Attribute[] }) =>
   items && items.length > 0 ? (
     <ul className="attrs">
@@ -58,7 +124,11 @@ const Mods = ({ mods }: { mods?: readonly string[] }) =>
     </ul>
   ) : null;
 
-export const GearCard = ({ piece }: { piece: GearPiece }) => {
+const EmptyBody = () => <h3 className="item-name is-plain">Empty</h3>;
+
+/** Named and exotic items print their own name in the rarity color; generic
+ *  high-ends print the brand or set in plain text, as the game does. */
+const GearBody = ({ piece }: { piece: GearPiece }) => {
   const set = piece.gearSetId ? GEAR_SETS_BY_ID.get(piece.gearSetId) : undefined;
   const brand = piece.brandId ? BRANDS_BY_ID.get(piece.brandId) : undefined;
   const source = set?.name ?? brand?.name;
@@ -76,8 +146,7 @@ export const GearCard = ({ piece }: { piece: GearPiece }) => {
       : undefined;
 
   return (
-    <article className={`item rarity-${piece.rarity}`}>
-      <div className="item-slot">{GEAR_SLOT_LABELS[piece.slot]}</div>
+    <>
       <div className="item-head">
         {mark ? (
           <span className={`mark tone-${mark.tone}`} aria-hidden="true">
@@ -93,52 +162,87 @@ export const GearCard = ({ piece }: { piece: GearPiece }) => {
       <AttributeList items={piece.attributes} />
       {piece.talent ? <div className="talent">{piece.talent}</div> : null}
       <Mods mods={piece.mod ? [piece.mod] : undefined} />
-    </article>
+    </>
   );
 };
 
-export const EmptyGearCard = ({ slot }: { slot: GearSlot }) => (
-  <article className="item is-empty">
-    <div className="item-slot">{GEAR_SLOT_LABELS[slot]}</div>
-    <h3 className="item-name is-plain">Empty</h3>
-  </article>
-);
-
-export const WeaponCard = ({ weapon }: { weapon: Weapon }) => (
-  <article className={`item rarity-${weapon.rarity}`}>
-    <div className="item-slot">{WEAPON_SLOT_LABELS[weapon.slot]}</div>
-    <h3 className="item-name">{weapon.name}</h3>
-    <div className="item-sub">{weapon.type}</div>
-    <Core
-      core={weapon.damage ? { name: "Damage", value: weapon.damage } : undefined}
-    />
-    <AttributeList items={weapon.attributes} />
-    {weapon.talent ? <div className="talent">{weapon.talent}</div> : null}
-    <Mods mods={weapon.mods} />
-  </article>
-);
-
-export const EmptyWeaponCard = ({ slot }: { slot: WeaponSlot }) => (
-  <article className="item is-empty">
-    <div className="item-slot">{WEAPON_SLOT_LABELS[slot]}</div>
-    <h3 className="item-name is-plain">Empty</h3>
-  </article>
-);
-
-export const SkillCard = ({
-  skill,
-  index,
+export const GearSlotCard = ({
+  slot,
+  piece,
+  editor,
 }: {
-  skill: EquippedSkill;
+  slot: GearSlot;
+  piece: GearPiece | undefined;
+  editor?: ReactNode;
+}) => (
+  <SlotShell
+    label={GEAR_SLOT_LABELS[slot]}
+    rarity={piece?.rarity}
+    empty={!piece}
+    editor={editor}
+  >
+    {piece ? <GearBody piece={piece} /> : <EmptyBody />}
+  </SlotShell>
+);
+
+export const WeaponSlotCard = ({
+  slot,
+  weapon,
+  editor,
+}: {
+  slot: WeaponSlot;
+  weapon: Weapon | undefined;
+  editor?: ReactNode;
+}) => (
+  <SlotShell
+    label={WEAPON_SLOT_LABELS[slot]}
+    rarity={weapon?.rarity}
+    empty={!weapon}
+    editor={editor}
+  >
+    {weapon ? (
+      <>
+        <h3 className="item-name">{weapon.name}</h3>
+        <div className="item-sub">{weapon.type}</div>
+        <Core
+          core={weapon.damage ? { name: "Damage", value: weapon.damage } : undefined}
+        />
+        <AttributeList items={weapon.attributes} />
+        {weapon.talent ? <div className="talent">{weapon.talent}</div> : null}
+        <Mods mods={weapon.mods} />
+      </>
+    ) : (
+      <EmptyBody />
+    )}
+  </SlotShell>
+);
+
+export const SkillSlotCard = ({
+  index,
+  skill,
+  editor,
+}: {
   index: number;
+  skill: EquippedSkill | undefined;
+  editor?: ReactNode;
 }) => {
-  const platform = SKILL_PLATFORMS_BY_ID.get(skill.platformId);
+  const platform = skill ? SKILL_PLATFORMS_BY_ID.get(skill.platformId) : undefined;
 
   return (
-    <article className="item rarity-specialized">
-      <div className="item-slot">Skill {index + 1}</div>
-      <h3 className="item-name">{platform?.name ?? skill.platformId}</h3>
-      <div className="item-sub">{skill.variant}</div>
-    </article>
+    <SlotShell
+      label={`Skill ${index + 1}`}
+      rarity="specialized"
+      empty={!skill}
+      editor={editor}
+    >
+      {skill ? (
+        <>
+          <h3 className="item-name">{platform?.name ?? skill.platformId}</h3>
+          <div className="item-sub">{skill.variant}</div>
+        </>
+      ) : (
+        <EmptyBody />
+      )}
+    </SlotShell>
   );
 };

@@ -525,7 +525,7 @@ body {
   font-size: 10px;
 }
 
-/* ---- slot pickers ---------------------------------------------------- */
+/* ---- toolbar and in-place editing ------------------------------------ */
 
 .editor-shell {
   max-width: 1280px;
@@ -533,31 +533,69 @@ body {
   padding: 24px 16px 0;
 }
 
-.editor {
-  padding: 16px 20px 18px;
-}
-
-.editor-head {
+.toolbar {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 14px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px 16px;
+  padding: 14px 20px;
 }
 
-.editor-head h2 {
+.build-picker {
+  flex: 1 1 260px;
+  max-width: 420px;
+}
+
+.build-picker .picker-select {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.toolbar-hint {
+  margin: 0 0 7px;
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.toolbar-hint b {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.action {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: transparent;
+  border: 1px solid var(--accent-dim);
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.action:hover {
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+
+.action:focus-visible,
+.edit-toggle:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.copy-status {
+  flex-basis: 100%;
   margin: 0;
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  font-weight: 400;
-}
-
-.picker-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 10px 14px;
+  font-size: 11.5px;
+  color: var(--text-dim);
 }
 
 .picker {
@@ -592,20 +630,77 @@ body {
   outline-offset: 1px;
 }
 
-.picker-select:disabled {
-  color: var(--text-faint);
-  cursor: default;
+/* Slot label and its Edit toggle. Lifted above the named/exotic chevron
+   watermark, which is drawn by ::after over the card. */
+.slot-head,
+.panel-head,
+.title-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-.picker-select.is-variant {
-  margin-top: 4px;
+.slot-head .edit-toggle,
+.panel-head .edit-toggle {
+  margin-left: auto;
 }
 
-.editor-note {
-  margin: 14px 0 0;
-  font-size: 12px;
-  line-height: 1.5;
+.edit-toggle {
+  font-family: var(--font-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
   color: var(--text-faint);
+  background: transparent;
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.edit-toggle:hover,
+.edit-toggle[aria-expanded="true"] {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.slot-editor {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 8px 0 10px;
+}
+
+.item.is-editing {
+  background: var(--bg-panel-alt);
+}
+
+.panel-head h2 {
+  margin-bottom: 0;
+}
+
+.spec .panel-head {
+  margin-bottom: 14px;
+}
+
+.spec-name.is-none {
+  color: var(--text-faint);
+}
+
+.title-input {
+  min-width: 0;
+  flex: 1 1 auto;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  background: var(--bg-panel-alt);
+  border: 1px solid var(--accent-dim);
+  padding: 2px 8px;
 }
 
 /* ---- equip rule violations ------------------------------------------- */
@@ -636,64 +731,6 @@ body {
 }
 
 /* ---- curated builds --------------------------------------------------- */
-
-.editor-head {
-  align-items: flex-end;
-  flex-wrap: wrap;
-}
-
-.build-picker {
-  flex: 1 1 260px;
-  max-width: 420px;
-}
-
-.build-picker .picker-select {
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.editor-actions {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-}
-
-.action {
-  font-family: var(--font-mono);
-  font-size: 10.5px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  background: transparent;
-  border: 1px solid var(--accent-dim);
-  padding: 6px 12px;
-  cursor: pointer;
-}
-
-.action:hover {
-  background: color-mix(in srgb, var(--accent) 12%, transparent);
-}
-
-.action:focus-visible {
-  outline: 1px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.copy-status {
-  margin: -4px 0 12px;
-  font-family: var(--font-mono);
-  font-size: 11.5px;
-  color: var(--text-dim);
-}
-
-input.picker-select {
-  cursor: text;
-}
-
-.editor-note code {
-  font-family: var(--font-mono);
-  color: var(--text-dim);
-}
 
 .build-notes {
   margin-bottom: 20px;
