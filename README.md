@@ -26,13 +26,15 @@ is a ToS and ban-risk problem — don't.
 
 ## Current state
 
-Editable, but nothing persists. `data/loadouts/sample.ts` is the starting
-loadout; slot pickers let you change gear brand/set, skills and specialization,
-and the set bonuses re-resolve live. A reload restores the sample.
+Curated builds, editable, but nothing persists. Each build in `data/builds/`
+has its own page at `/builds/<id>`, and `/` shows the first one. Slot pickers
+change gear brand or set, skills and specialization, and the set bonuses
+re-resolve live. A reload restores the curated build.
 
 ```
 app/layout.tsx                 fonts + html shell
-app/page.tsx                   mounts the editor with the sample loadout
+app/page.tsx                   the default curated build
+app/builds/[id]/page.tsx       one prerendered page per curated build
 app/globals.css                all styling
 components/LoadoutEditor.tsx   picker state, renders the screen below
 components/LoadoutScreen.tsx   page composition
@@ -41,11 +43,13 @@ components/SlotPickers.tsx     gear / skill / specialization selects
 data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
 data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
 data/skills.ts                 skill platforms, variants, specs     (generated)
-data/loadouts/sample.ts        the starting loadout
+data/builds/*.json             curated builds, one file each
+data/builds/index.ts           build list; validates every build at build time
 lib/types.ts                   loadout schema
 lib/setBonuses.ts              piece counting and bonus unlocking
 lib/loadoutEdits.ts            pure loadout transforms used by the pickers
 lib/equipRules.ts              equip restrictions (one exotic weapon, one exotic armor)
+lib/buildFormat.ts             build file format: parser, validator, serializer
 lib/brandMarks.ts              generated monograms + tone classification
 scripts/build-data.mjs         regenerates the three data files
 ```
@@ -128,6 +132,30 @@ each tier active or locked. Two rules are worth knowing:
   apply when that specific slot is a piece of the set, regardless of total
   pieces, so they are resolved per-slot rather than per-tier.
 
+## Curated builds
+
+A build is a JSON file in `data/builds/`, in the format defined by
+`lib/buildFormat.ts`: a `version`, an `id` matching the filename, an optional
+`source` it was transcribed from, and the loadout. Gear refers to brands and
+gear sets by id, so a display-name change never breaks a build.
+
+To add one:
+
+1. Open any build, change it with the pickers, and give it a new name.
+2. Use **Copy JSON**. A renamed build gets a new id and drops the original's
+   source; an unrenamed one keeps both, so editing a curated build and copying
+   it produces a replacement for that build's file.
+3. Save the JSON as `data/builds/<id>.json`, add it to the list in
+   `data/builds/index.ts`, and open a PR.
+
+`data/builds/index.ts` parses every build and checks it against the equip rules
+when it loads, which happens during `next build`. A malformed file, a brand or
+gear set id that a data regeneration removed, a mismatched filename, or an
+illegal build fails the build — and so CI — instead of shipping.
+
+The same format is intended for builds saved in the browser and for JSON
+import/export, so a build moves between all three without conversion.
+
 ## Equip rules
 
 The game allows **one exotic weapon and one exotic armor piece** at a time —
@@ -139,19 +167,28 @@ bad import or hand-edited loadout is flagged instead of rendering as if valid.
 ## Known gaps
 
 - Attribute values (core magnitudes, secondary rolls) are hand-entered in the
-  sample. `lib/types.ts` has room for them; no source emits per-roll values.
+  NinjaBike demo build. `lib/types.ts` has room for them; no source emits per-roll values.
 - Expertise, Optimization, and Prototype state are absent entirely.
 - Decoy, Trap, and Sticky Bomb variant names need verifying against the current
   title update — community sources disagree, and upstream lists only one Decoy
   variant. Everything above them in `data/skills.ts` is stable.
-- Weapon damage figures in the sample are illustrative, not rolled.
+- Weapon damage figures in the NinjaBike demo build are illustrative, not rolled.
 - The pickers cover gear source, skills and specialization only. Weapons are not
   pickable — no weapon data is generated into `data/` yet — and named gear
   cannot be chosen, so changing a slot always yields a generic piece.
 
+- **St. Elmo's Red Striker is partly transcribed.** Its gear sources,
+  weapons, exotics and playstyle notes are in; its sidearm, skills,
+  specialization, rolled attributes, mods and chest talent are not yet.
+  Those fields are left empty rather than guessed.
+- The NinjaBike Wildcard Demo is a demonstration of the wildcard rule, not a
+  recommended build.
+
 ## Next steps, in order
 
-1. Persist to `localStorage`, plus JSON import/export. Read
+1. Save personal builds to `localStorage`, plus JSON import/export, using the
+   format in `lib/buildFormat.ts` — its parser already returns errors rather
+   than throwing, for exactly this. Read
    `Division2-Loadout/ui` first — it solved exactly this and its README is
    honest about scope.
 2. Cover `lib/setBonuses.ts`, `lib/loadoutEdits.ts` and `lib/brandMarks.ts` with

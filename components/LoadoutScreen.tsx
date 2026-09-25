@@ -1,5 +1,6 @@
 import { SPECIALIZATIONS_BY_ID } from "@/data/skills";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
+import type { BuildSource } from "@/lib/buildFormat";
 import { findViolations } from "@/lib/equipRules";
 import { hasWildcard, resolveSets, type ActiveSet } from "@/lib/setBonuses";
 import type { GearSlot, Loadout, WeaponSlot } from "@/lib/types";
@@ -70,10 +71,19 @@ const SetPanel = ({ set }: { set: ActiveSet }) => {
   );
 };
 
-export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
+export const LoadoutScreen = ({
+  loadout,
+  source,
+}: {
+  loadout: Loadout;
+  /** Where a curated build was transcribed from, when it has a source. */
+  source?: BuildSource;
+}) => {
   const sets = resolveSets(loadout);
   const violations = findViolations(loadout);
-  const spec = SPECIALIZATIONS_BY_ID.get(loadout.specializationId);
+  const spec = loadout.specializationId
+    ? SPECIALIZATIONS_BY_ID.get(loadout.specializationId)
+    : undefined;
   const gearBySlot = new Map(loadout.gear.map((piece) => [piece.slot, piece]));
   const weaponsBySlot = new Map(loadout.weapons.map((w) => [w.slot, w]));
 
@@ -105,6 +115,17 @@ export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
           </span>
         ) : null}
       </header>
+
+      {loadout.notes || source ? (
+        <section className="build-notes panel">
+          {loadout.notes ? <p>{loadout.notes}</p> : null}
+          {source ? (
+            <p className="build-source">
+              Source: <a href={source.url}>{source.label}</a>
+            </p>
+          ) : null}
+        </section>
+      ) : null}
 
       {violations.length > 0 ? (
         <section className="violations panel" role="alert">
@@ -147,6 +168,9 @@ export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
           <h2 className="column-head" style={{ marginTop: 10 }}>
             Skills
           </h2>
+          {loadout.skills.length === 0 ? (
+            <p className="empty-note">No skills set.</p>
+          ) : null}
           {loadout.skills.map((skill, i) => (
             <SkillCard key={`${skill.platformId}-${i}`} skill={skill} index={i} />
           ))}
@@ -191,8 +215,8 @@ export const LoadoutScreen = ({ loadout }: { loadout: Loadout }) => {
 
       <footer className="colophon">
         <p>
-          Read-only view. Nothing here is editable and nothing persists — the
-          loadout is hardcoded in <code>data/loadouts/sample.ts</code>.
+          Curated builds live in <code>data/builds/</code>. Edits in the pickers
+          above are not saved; a reload restores the build.
         </p>
         <p>
           Set and skill data generated from{" "}

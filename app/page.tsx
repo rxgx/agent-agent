@@ -1,6 +1,6 @@
 import { LoadoutEditor } from "@/components/LoadoutEditor";
-import { sampleLoadout } from "@/data/loadouts/sample";
+import { DEFAULT_BUILD } from "@/data/builds";
 
 export default function Page() {
-  return <LoadoutEditor initial={sampleLoadout} />;
+  return <LoadoutEditor key={DEFAULT_BUILD.id} build={DEFAULT_BUILD} />;
 }

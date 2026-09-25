@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "id": "st-elmos-red-striker",
+  "source": {
+    "label": "Grindout — Division 2 builds",
+    "url": "https://grindout.com/division-2/guides/builds"
+  },
+  "loadout": {
+    "name": "St. Elmo's Red Striker",
+    "gear": [
+      {
+        "slot": "mask",
+        "rarity": "gearSet",
+        "gearSetId": "striker-s-battlegear",
+        "core": { "name": "Weapon Damage" }
+      },
+      {
+        "slot": "chest",
+        "rarity": "highEnd",
+        "brandId": "fenris-group-ab",
+        "core": { "name": "Weapon Damage" }
+      },
+      {
+        "slot": "backpack",
+        "name": "Memento",
+        "rarity": "exotic",
+        "core": { "name": "Weapon Damage" },
+        "talent": "Kill Confirmed"
+      },
+      {
+        "slot": "gloves",
+        "rarity": "gearSet",
+        "gearSetId": "striker-s-battlegear",
+        "core": { "name": "Weapon Damage" }
+      },
+      {
+        "slot": "holster",
+        "rarity": "gearSet",
+        "gearSetId": "striker-s-battlegear",
+        "core": { "name": "Weapon Damage" }
+      },
+      {
+        "slot": "kneepads",
+        "rarity": "gearSet",
+        "gearSetId": "striker-s-battlegear",
+        "core": { "name": "Weapon Damage" }
+      }
+    ],
+    "weapons": [
+      {
+        "slot": "primary",
+        "name": "St. Elmo's Engine",
+        "type": "Assault Rifle",
+        "rarity": "exotic",
+        "talent": "Actum Est"
+      },
+      {
+        "slot": "secondary",
+        "name": "ACS-12",
+        "type": "Shotgun",
+        "rarity": "highEnd"
+      }
+    ],
+    "skills": [],
+    "notes": "Open a fight with the ACS-12 at close range to build Striker's Gamble stacks, then switch to St. Elmo's Engine for sustained fire. Pick up Memento trophies when it is safe to. Stack critical hit chance to about 50–55%, then critical hit damage."
+  }
+}

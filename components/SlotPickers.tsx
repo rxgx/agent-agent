@@ -8,7 +8,7 @@ import {
   decodeSource,
   type GearSource,
 } from "@/lib/loadoutEdits";
-import type { GearSlot } from "@/lib/types";
+import type { EquippedSkill, GearSlot } from "@/lib/types";
 
 const GEAR_SLOT_LABELS: Record<GearSlot, string> = {
   mask: "Mask",
@@ -22,10 +22,13 @@ const GEAR_SLOT_LABELS: Record<GearSlot, string> = {
 export const GearSourcePicker = ({
   slot,
   source,
+  currentItemName,
   onChange,
 }: {
   slot: GearSlot;
   source: GearSource;
+  /** The named or exotic piece in the slot now, if the pickers can't rebuild it. */
+  currentItemName?: string;
   onChange: (next: GearSource) => void;
 }) => (
   <label className="picker">
@@ -36,6 +39,13 @@ export const GearSourcePicker = ({
       onChange={(e) => onChange(decodeSource(e.target.value))}
     >
       <option value="empty">— Empty —</option>
+
+      {/* Offered only while equipped: switching away drops it for good. */}
+      {source.kind === "item" && currentItemName ? (
+        <optgroup label="Equipped">
+          <option value="item">{currentItemName}</option>
+        </optgroup>
+      ) : null}
 
       {/* Backpack only: the one exotic the bonus engine models. */}
       {slot === "backpack" ? (
@@ -65,29 +75,30 @@ export const GearSourcePicker = ({
 
 export const SkillPicker = ({
   index,
-  platformId,
-  variant,
+  skill,
   onChange,
 }: {
   index: number;
-  platformId: string;
-  variant: string;
-  onChange: (platformId: string, variant: string) => void;
+  skill: EquippedSkill | undefined;
+  onChange: (next: EquippedSkill | null) => void;
 }) => {
-  const platform = SKILL_PLATFORMS.find((p) => p.id === platformId);
+  const platform = skill
+    ? SKILL_PLATFORMS.find((p) => p.id === skill.platformId)
+    : undefined;
 
   return (
     <label className="picker">
       <span className="picker-label">Skill {index + 1}</span>
       <select
         className="picker-select"
-        value={platformId}
+        value={skill?.platformId ?? ""}
         onChange={(e) => {
           const next = SKILL_PLATFORMS.find((p) => p.id === e.target.value);
           // Variants do not survive a platform change — they belong to it.
-          onChange(e.target.value, next?.variants[0] ?? "");
+          onChange(next ? { platformId: next.id, variant: next.variants[0] } : null);
         }}
       >
+        <option value="">— None —</option>
         {SKILL_PLATFORMS.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name}
@@ -97,15 +108,21 @@ export const SkillPicker = ({
 
       <select
         className="picker-select is-variant"
-        value={variant}
-        onChange={(e) => onChange(platformId, e.target.value)}
+        value={skill?.variant ?? ""}
+        onChange={(e) =>
+          skill && onChange({ platformId: skill.platformId, variant: e.target.value })
+        }
         disabled={!platform || platform.variants.length === 0}
       >
-        {(platform?.variants ?? []).map((v) => (
-          <option key={v} value={v}>
-            {v}
-          </option>
-        ))}
+        {platform ? (
+          platform.variants.map((v) => (
+            <option key={v} value={v}>
+              {v}
+            </option>
+          ))
+        ) : (
+          <option value="">—</option>
+        )}
       </select>
     </label>
   );
@@ -115,16 +132,17 @@ export const SpecializationPicker = ({
   specializationId,
   onChange,
 }: {
-  specializationId: string;
+  specializationId: string | undefined;
   onChange: (id: string) => void;
 }) => (
   <label className="picker">
     <span className="picker-label">Specialization</span>
     <select
       className="picker-select"
-      value={specializationId}
+      value={specializationId ?? ""}
       onChange={(e) => onChange(e.target.value)}
     >
+      <option value="">— None —</option>
       {SPECIALIZATIONS.map((spec) => (
         <option key={spec.id} value={spec.id}>
           {spec.name}
