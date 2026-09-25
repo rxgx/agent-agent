@@ -168,56 +168,47 @@ export const WeaponSelect = ({
   );
 };
 
-export const SkillSelects = ({
+/** A skill as a single select value, e.g. "shield:Crusader". */
+const encodeSkill = (skill: EquippedSkill | undefined) =>
+  skill ? `${skill.platformId}:${skill.variant}` : "";
+
+const decodeSkill = (value: string): EquippedSkill | null => {
+  const at = value.indexOf(":");
+  return at > 0
+    ? { platformId: value.slice(0, at), variant: value.slice(at + 1) }
+    : null;
+};
+
+/**
+ * One select for both halves of a skill: each skill type is a group, with its
+ * variants underneath — Shield › Crusader, Hive › Reviver — so a choice is a
+ * single step rather than a type followed by a variant.
+ */
+export const SkillSelect = ({
   skill,
   onChange,
 }: {
   skill: EquippedSkill | undefined;
   onChange: (next: EquippedSkill | null) => void;
-}) => {
-  const platform = skill
-    ? SKILL_PLATFORMS.find((p) => p.id === skill.platformId)
-    : undefined;
-
-  return (
-    <>
-      <select
-        className="picker-select"
-        aria-label="Skill"
-        value={skill?.platformId ?? ""}
-        onChange={(e) => {
-          const next = SKILL_PLATFORMS.find((p) => p.id === e.target.value);
-          // Variants do not survive a platform change — they belong to it.
-          onChange(next ? { platformId: next.id, variant: next.variants[0] } : null);
-        }}
-      >
-        <option value="">— None —</option>
-        {SKILL_PLATFORMS.map((p) => (
-          <option key={p.id} value={p.id}>
-            {p.name}
+}) => (
+  <select
+    className="picker-select"
+    aria-label="Skill"
+    value={encodeSkill(skill)}
+    onChange={(e) => onChange(decodeSkill(e.target.value))}
+  >
+    <option value="">— None —</option>
+    {SKILL_PLATFORMS.map((platform) => (
+      <optgroup key={platform.id} label={platform.name}>
+        {platform.variants.map((variant) => (
+          <option key={variant} value={`${platform.id}:${variant}`}>
+            {variant}
           </option>
         ))}
-      </select>
-
-      {platform ? (
-        <select
-          className="picker-select"
-          aria-label="Skill variant"
-          value={skill?.variant ?? ""}
-          onChange={(e) =>
-            onChange({ platformId: platform.id, variant: e.target.value })
-          }
-        >
-          {platform.variants.map((v) => (
-            <option key={v} value={v}>
-              {v}
-            </option>
-          ))}
-        </select>
-      ) : null}
-    </>
-  );
-};
+      </optgroup>
+    ))}
+  </select>
+);
 
 export const SpecializationSelect = ({
   specializationId,

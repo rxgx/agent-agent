@@ -12,38 +12,50 @@
         "slot": "mask",
         "rarity": "gearSet",
         "gearSetId": "striker-s-battlegear",
-        "core": { "name": "Weapon Damage" }
+        "core": {
+          "name": "Weapon Damage"
+        }
       },
       {
         "slot": "chest",
         "rarity": "highEnd",
         "brandId": "fenris-group-ab",
-        "core": { "name": "Weapon Damage" }
+        "core": {
+          "name": "Weapon Damage"
+        }
       },
       {
         "slot": "backpack",
         "name": "Memento",
         "rarity": "exotic",
-        "core": { "name": "Weapon Damage" },
+        "core": {
+          "name": "Weapon Damage"
+        },
         "talent": "Kill Confirmed"
       },
       {
         "slot": "gloves",
         "rarity": "gearSet",
         "gearSetId": "striker-s-battlegear",
-        "core": { "name": "Weapon Damage" }
+        "core": {
+          "name": "Weapon Damage"
+        }
       },
       {
         "slot": "holster",
         "rarity": "gearSet",
         "gearSetId": "striker-s-battlegear",
-        "core": { "name": "Weapon Damage" }
+        "core": {
+          "name": "Weapon Damage"
+        }
       },
       {
         "slot": "kneepads",
         "rarity": "gearSet",
         "gearSetId": "striker-s-battlegear",
-        "core": { "name": "Weapon Damage" }
+        "core": {
+          "name": "Weapon Damage"
+        }
       }
     ],
     "weapons": [
@@ -61,7 +73,16 @@
         "rarity": "highEnd"
       }
     ],
-    "skills": [],
+    "skills": [
+      {
+        "platformId": "shield",
+        "variant": "Crusader"
+      },
+      {
+        "platformId": "decoy",
+        "variant": "Holographic Distraction"
+      }
+    ],
     "notes": "Open a fight with the ACS-12 at close range to build Striker's Gamble stacks, then switch to St. Elmo's Engine for sustained fire. Pick up Memento trophies when it is safe to. Stack critical hit chance to about 50–55%, then critical hit damage."
   }
 }

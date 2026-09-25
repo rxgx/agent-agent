@@ -3,7 +3,7 @@
 import { useState } from "react";
 import {
   GearSelect,
-  SkillSelects,
+  SkillSelect,
   SpecializationSelect,
   WeaponSelect,
 } from "@/components/SlotControls";
@@ -263,7 +263,7 @@ export const LoadoutScreen = ({
                   index={i}
                   skill={loadout.skills[i]}
                   editor={
-                    <SkillSelects
+                    <SkillSelect
                       skill={loadout.skills[i]}
                       onChange={(next) => edit.skill(i, next)}
                     />

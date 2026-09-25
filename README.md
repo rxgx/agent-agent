@@ -185,9 +185,11 @@ everything else.
   not editable; choosing an item sets its name, rarity, core and talent only.
 
 - **St. Elmo's Red Striker is partly transcribed.** Its gear sources,
-  weapons, exotics and playstyle notes are in; its sidearm, skills,
-  specialization, rolled attributes, mods and chest talent are not yet.
-  Those fields are left empty rather than guessed.
+  weapons, exotics, skills (Crusader Shield and Decoy) and playstyle notes are
+  in; its sidearm, specialization, rolled attributes, mods and chest talent are
+  not yet. Those fields are left empty rather than guessed.
+- Decoy has a single variant in the data, "Holographic Distraction". Its name
+  is among the Decoy, Trap and Sticky Bomb variants still to verify.
 - The NinjaBike Wildcard Demo is a demonstration of the wildcard rule, not a
   recommended build.
 
