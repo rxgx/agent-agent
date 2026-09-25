@@ -136,8 +136,7 @@
         "talent": "Actum Est",
         "attributes": [
           {
-            "name": "Rate of Fire",
-            "value": "700 RPM"
+            "name": "Rate of Fire"
           }
         ],
         "mods": [
@@ -155,8 +154,7 @@
         "talent": "Perfectly Vindictive",
         "attributes": [
           {
-            "name": "Magazine",
-            "value": "50"
+            "name": "Magazine Size"
           }
         ],
         "mods": [

@@ -11,6 +11,7 @@
 import { BRANDS } from "@/data/brands";
 import { GEAR_SETS } from "@/data/gearSets";
 import { SKILL_PLATFORMS, SPECIALIZATIONS } from "@/data/skills";
+import { WEAPON_ATTRIBUTES } from "@/data/weaponAttributes";
 import {
   decodeGearSource,
   decodeWeaponSource,
@@ -29,6 +30,7 @@ import type {
   EquippedSkill,
   GearSlot,
   Loadout,
+  Weapon,
   WeaponDef,
   WeaponSlot,
   WeaponType,
@@ -163,6 +165,40 @@ export const WeaponSelect = ({
             );
           })}
         </optgroup>
+      ))}
+    </select>
+  );
+};
+
+/**
+ * The weapon's third attribute. Its two cores are fixed by type, so this is
+ * the only attribute there is to choose. Each option shows its best roll.
+ */
+export const WeaponAttributeSelect = ({
+  weapon,
+  onChange,
+}: {
+  weapon: Weapon;
+  onChange: (name: string | null) => void;
+}) => {
+  const current = weapon.attributes?.[0]?.name ?? "";
+  const known = WEAPON_ATTRIBUTES.some((a) => a.name === current);
+
+  return (
+    <select
+      className="picker-select"
+      aria-label={`${weapon.slot} weapon attribute`}
+      value={current}
+      onChange={(e) => onChange(e.target.value || null)}
+    >
+      <option value="">— No attribute —</option>
+      {/* An attribute the data doesn't list stays selectable while equipped. */}
+      {current && !known ? <option value={current}>{current}</option> : null}
+      {WEAPON_ATTRIBUTES.map((a) => (
+        <option key={a.name} value={a.name}>
+          {a.name}
+          {a.max ? ` (up to ${a.max})` : ""}
+        </option>
       ))}
     </select>
   );

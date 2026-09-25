@@ -69,6 +69,10 @@ export interface Weapon {
   readonly rarity: Rarity;
   readonly damage?: string;
   readonly talent?: string;
+  /**
+   * The rolled third attribute. The two cores are fixed by `type`, so they
+   * are not stored; see `WEAPON_CORES`.
+   */
   readonly attributes?: readonly Attribute[];
   readonly mods?: readonly string[];
 }
@@ -132,6 +136,12 @@ export interface WeaponDef {
   readonly rarity: "highEnd" | "named" | "exotic";
   /** Talent name for named and exotic weapons; base weapons roll theirs. */
   readonly talent: string | null;
+}
+
+/** A weapon attribute as the data knows it: its name and its best roll. */
+export interface WeaponAttributeDef {
+  readonly name: string;
+  readonly max: string | null;
 }
 
 /** A named or exotic gear piece. Generic brand and gear set pieces are built from their set. */

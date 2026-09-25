@@ -244,6 +244,13 @@ body {
   transform: rotate(45deg);
 }
 
+/* A weapon's second core sits directly under its first, sharing the rule. */
+.core + .core {
+  margin-top: 4px;
+  padding-top: 0;
+  border-top: 0;
+}
+
 .core-name {
   color: var(--text-dim);
 }

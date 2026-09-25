@@ -65,7 +65,12 @@
         "name": "St. Elmo's Engine",
         "type": "Assault Rifle",
         "rarity": "exotic",
-        "talent": "Actum Est"
+        "talent": "Actum Est",
+        "attributes": [
+          {
+            "name": "Damage to Target out of Cover"
+          }
+        ]
       },
       {
         "slot": "secondary",

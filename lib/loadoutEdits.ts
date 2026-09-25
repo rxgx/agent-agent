@@ -191,6 +191,23 @@ export const setWeaponSource = (
   return { ...loadout, weapons: [...others, weapon] };
 };
 
+/**
+ * Set or clear a weapon's rolled third attribute. A new attribute starts
+ * without a value, since the value belonged to the roll it replaces.
+ */
+export const setWeaponAttribute = (
+  loadout: Loadout,
+  slot: WeaponSlot,
+  name: string | null,
+): Loadout => ({
+  ...loadout,
+  weapons: loadout.weapons.map((w) => {
+    if (w.slot !== slot || w.attributes?.[0]?.name === (name ?? undefined)) return w;
+    const { attributes: _dropped, ...rest } = w;
+    return name ? { ...rest, attributes: [{ name }] } : rest;
+  }),
+});
+
 /* ---- the exotic rule, as the pickers apply it --------------------- */
 
 /**

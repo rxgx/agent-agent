@@ -1,6 +1,6 @@
 /**
- * Regenerates `data/brands.ts`, `data/gearSets.ts`, `data/skills.ts` and
- * `data/items.ts` from
+ * Regenerates `data/brands.ts`, `data/gearSets.ts`, `data/skills.ts`,
+ * `data/items.ts` and `data/weaponAttributes.ts` from
  * knowlesy/division-config, an MIT-licensed pipeline that extracts, patches and
  * validates the community build spreadsheet.
  *
@@ -56,6 +56,7 @@ const main = async () => {
     gearNamed,
     weaponsBase,
     weaponsNamed,
+    attributes,
   ] = await Promise.all([
     get("meta"),
     get("brand-sets"),
@@ -65,6 +66,7 @@ const main = async () => {
     get("gear-named"),
     get("weapons"),
     get("weapons-named"),
+    get("attributes"),
   ]);
 
   // ---- brands ----------------------------------------------------------
@@ -218,6 +220,7 @@ export const SPECIALIZATIONS_BY_ID: ReadonlyMap<string, Specialization> = new Ma
     shotgun: "Shotgun",
     rifle: "Rifle",
     "marksman rifle": "Marksman Rifle",
+    mmr: "Marksman Rifle",
     pistol: "Pistol",
   };
   const weaponType = (category) => {
@@ -344,10 +347,59 @@ export const GEAR_ITEMS_BY_ID: ReadonlyMap<string, GearItemDef> = new Map(
 `,
   );
 
+  // ---- weapon attributes ------------------------------------------------
+  // Every weapon rolls its type's damage, a second core fixed by its type
+  // (pistols have none), and one attribute from a shared list. Upstream labels
+  // cores "<type>:\n<attribute>" and abbreviates one attribute name.
+  const ATTRIBUTE_NAME = {
+    "dmg to target out of cover": "Damage to Target out of Cover",
+  };
+  const attributeName = (s) => ATTRIBUTE_NAME[clean(s).toLowerCase()] ?? clean(s);
+  const attributeDef = (a, name) => ({ name, max: clean(a.rawMax) });
+
+  let damageCore;
+  const secondCores = new Map();
+  for (const a of [...attributes.weaponCore, ...attributes.weaponSecondaryFixed]) {
+    const [label, attr] = a.name.split("\n").map(clean);
+    const scope = label.replace(/:$/, "");
+    if (scope.toLowerCase() === "all weapons") damageCore = a;
+    else secondCores.set(weaponType(scope), attr === "NA" ? null : attributeDef(a, attributeName(attr)));
+  }
+  if (!damageCore) throw new Error("no weapon damage core in attributes.json");
+  const weaponCores = Object.fromEntries(
+    [...new Set(Object.values(WEAPON_TYPE))].map((type) => {
+      if (!secondCores.has(type)) throw new Error(`no second core for ${type}`);
+      const second = secondCores.get(type);
+      return [type, [attributeDef(damageCore, `${type} Damage`), ...(second ? [second] : [])]];
+    }),
+  );
+  const weaponMinors = attributes.weaponMinors.map((a) => attributeDef(a, attributeName(a.name)));
+
+  const attrLiteral = (a) => `{ name: ${q(a.name)}, max: ${q(a.max)} }`;
+  await writeFile(
+    "data/weaponAttributes.ts",
+    `${header(meta, `Weapon cores by type, and the ${weaponMinors.length} attributes a weapon can roll.`)}
+import type { WeaponAttributeDef, WeaponType } from "@/lib/types";
+
+/** Fixed by weapon type: its damage, then a second core (none on pistols). */
+export const WEAPON_CORES: Readonly<Record<WeaponType, readonly WeaponAttributeDef[]>> = {
+${Object.entries(weaponCores)
+  .map(([type, cores]) => `  ${q(type)}: [${cores.map(attrLiteral).join(", ")}],`)
+  .join("\n")}
+};
+
+/** The third attribute: one roll from this list. */
+export const WEAPON_ATTRIBUTES: readonly WeaponAttributeDef[] = [
+${weaponMinors.map((a) => `  ${attrLiteral(a)},`).join("\n")}
+];
+`,
+  );
+
   console.log(
     `patch ${meta.patch}: ${brands.length} brands, ${sets.length} gear sets, ` +
       `${platforms.length} skill platforms, ${specializations.length} specializations, ` +
-      `${weapons.length} weapons, ${gearItems.length} named/exotic gear pieces`,
+      `${weapons.length} weapons, ${gearItems.length} named/exotic gear pieces, ` +
+      `${weaponMinors.length} weapon attributes`,
   );
   if (unmatchedBrands.size > 0) {
     console.warn(`named gear with no matching brand: ${[...unmatchedBrands].join(", ")}`);

@@ -18,6 +18,7 @@ import {
   setName,
   setSkill,
   setSpecialization,
+  setWeaponAttribute,
   setWeaponSource,
 } from "@/lib/loadoutEdits";
 import type { Loadout } from "@/lib/types";
@@ -57,6 +58,8 @@ export const LoadoutEditor = ({ build }: { build: BuildFile }) => {
     name: (name) => setLoadout((l) => setName(l, name)),
     gear: (slot, source) => setLoadout((l) => setGearSource(l, slot, source)),
     weapon: (slot, source) => setLoadout((l) => setWeaponSource(l, slot, source)),
+    weaponAttribute: (slot, name) =>
+      setLoadout((l) => setWeaponAttribute(l, slot, name)),
     skill: (index, skill) => setLoadout((l) => setSkill(l, index, skill)),
     specialization: (id) => setLoadout((l) => setSpecialization(l, id)),
   };

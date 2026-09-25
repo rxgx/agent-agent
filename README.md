@@ -33,6 +33,12 @@ card, the specialization panel and the build name show their controls at once,
 on the cards themselves, and the set bonuses re-resolve live. **Done** switches
 back. A reload restores the curated build.
 
+Weapon cards show all of a weapon's attributes. The two cores are fixed by
+weapon type (an assault rifle always has Assault Rifle Damage and Health
+Damage; a pistol has only Pistol Damage), so they are derived rather than
+stored. The third attribute is a roll, so a build stores it, and edit mode
+picks it from the 13 the game allows.
+
 ```
 app/layout.tsx                 fonts + html shell
 app/page.tsx                   the default curated build
@@ -46,6 +52,7 @@ data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
 data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
 data/skills.ts                 skill platforms, variants, specs     (generated)
 data/items.ts                  390 weapons, 102 named/exotic gear   (generated)
+data/weaponAttributes.ts       weapon cores by type, 13 rollable    (generated)
 data/builds/*.json             curated builds, one file each
 data/builds/index.ts           build list; validates every build at build time
 lib/types.ts                   loadout schema
@@ -177,18 +184,21 @@ everything else.
 
 - Attribute values (core magnitudes, secondary rolls) are hand-entered in the
   NinjaBike demo build. `lib/types.ts` has room for them; no source emits per-roll values.
+  Weapon attributes show names only; the edit-mode dropdown shows each one's best roll.
 - Expertise, Optimization, and Prototype state are absent entirely.
 - Decoy, Trap, and Sticky Bomb variant names need verifying against the current
   title update — community sources disagree, and upstream lists only one Decoy
   variant. Everything above them in `data/skills.ts` is stable.
 - Weapon damage figures in the NinjaBike demo build are illustrative, not rolled.
-- Rolled attributes, mods and weapon talents on base (non-named) weapons are
-  not editable; choosing an item sets its name, rarity, core and talent only.
+- Mods and weapon talents on base (non-named) weapons are not editable, and
+  neither are gear attributes; choosing an item sets its name, rarity, core
+  and talent only. A weapon's third attribute is editable.
 
 - **St. Elmo's Red Striker is partly transcribed.** Its gear sources,
   weapons (including the Quickstep sidearm), exotics, skills (Crusader Shield
-  and Decoy), Gunner specialization and playstyle notes are in; its rolled
-  attributes, mods and chest talent are not yet. Those fields are left empty
+  and Decoy), Gunner specialization, St. Elmo's third attribute (Damage to
+  Target out of Cover) and playstyle notes are in; its gear attributes, the
+  ACS-12's and Quickstep's third attributes, mods and chest talent are not yet. Those fields are left empty
   rather than guessed.
 - Decoy has a single variant in the data, "Holographic Distraction". Its name
   is among the Decoy, Trap and Sticky Bomb variants still to verify.

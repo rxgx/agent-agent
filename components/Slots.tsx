@@ -5,6 +5,7 @@ import { BRANDS_BY_ID } from "@/data/brands";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
 import { SKILL_PLATFORMS_BY_ID } from "@/data/skills";
+import { WEAPON_CORES } from "@/data/weaponAttributes";
 import type {
   Attribute,
   EquippedSkill,
@@ -169,10 +170,14 @@ export const WeaponSlotCard = ({
     {weapon ? (
       <>
         <h3 className="item-name">{weapon.name}</h3>
-        <div className="item-sub">{weapon.type}</div>
-        <Core
-          core={weapon.damage ? { name: "Damage", value: weapon.damage } : undefined}
-        />
+        <div className="item-sub">
+          {weapon.type}
+          {weapon.damage ? ` · ${weapon.damage} damage` : ""}
+        </div>
+        {/* The cores are fixed by weapon type, so every weapon shows them. */}
+        {WEAPON_CORES[weapon.type].map((core) => (
+          <Core key={core.name} core={{ name: core.name }} />
+        ))}
         <AttributeList items={weapon.attributes} />
         {weapon.talent ? <div className="talent">{weapon.talent}</div> : null}
         <Mods mods={weapon.mods} />

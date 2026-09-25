@@ -4,6 +4,7 @@ import {
   GearSelect,
   SkillSelect,
   SpecializationSelect,
+  WeaponAttributeSelect,
   WeaponSelect,
 } from "@/components/SlotControls";
 import { SPECIALIZATIONS_BY_ID } from "@/data/skills";
@@ -36,6 +37,7 @@ export interface LoadoutEditHandlers {
   readonly name: (name: string) => void;
   readonly gear: (slot: GearSlot, source: GearSource) => void;
   readonly weapon: (slot: WeaponSlot, source: WeaponSource) => void;
+  readonly weaponAttribute: (slot: WeaponSlot, name: string | null) => void;
   readonly skill: (index: number, skill: EquippedSkill | null) => void;
   readonly specialization: (id: string) => void;
 }
@@ -216,22 +218,33 @@ export const LoadoutScreen = ({
 
         <section className="column">
           <h2 className="column-head">Weapons</h2>
-          {WEAPON_ORDER.map((slot) => (
-            <WeaponSlotCard
-              key={slot}
-              slot={slot}
-              weapon={weaponsBySlot.get(slot)}
-              editor={
-                edit ? (
-                  <WeaponSelect
-                    slot={slot}
-                    loadout={loadout}
-                    onChange={(next) => edit.weapon(slot, next)}
-                  />
-                ) : undefined
-              }
-            />
-          ))}
+          {WEAPON_ORDER.map((slot) => {
+            const weapon = weaponsBySlot.get(slot);
+            return (
+              <WeaponSlotCard
+                key={slot}
+                slot={slot}
+                weapon={weapon}
+                editor={
+                  edit ? (
+                    <>
+                      <WeaponSelect
+                        slot={slot}
+                        loadout={loadout}
+                        onChange={(next) => edit.weapon(slot, next)}
+                      />
+                      {weapon ? (
+                        <WeaponAttributeSelect
+                          weapon={weapon}
+                          onChange={(name) => edit.weaponAttribute(slot, name)}
+                        />
+                      ) : null}
+                    </>
+                  ) : undefined
+                }
+              />
+            );
+          })}
 
           <h2 className="column-head" style={{ marginTop: 10 }}>
             Skills
