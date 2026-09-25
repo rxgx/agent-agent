@@ -69,6 +69,10 @@ export interface Weapon {
   readonly rarity: Rarity;
   readonly damage?: string;
   readonly talent?: string;
+  /**
+   * The rolled third attribute. The two cores are fixed by `type`, so they
+   * are not stored; see `WEAPON_CORES`.
+   */
   readonly attributes?: readonly Attribute[];
   readonly mods?: readonly string[];
 }
@@ -122,4 +126,34 @@ export interface Specialization {
   readonly id: string;
   readonly name: string;
   readonly passives: readonly string[];
+}
+
+/** A pickable weapon: a base high-end gun, or a named or exotic one. */
+export interface WeaponDef {
+  readonly id: string;
+  readonly name: string;
+  readonly type: WeaponType;
+  readonly rarity: "highEnd" | "named" | "exotic";
+  /** Talent name for named and exotic weapons; base weapons roll theirs. */
+  readonly talent: string | null;
+}
+
+/** A weapon attribute as the data knows it: its name and its best roll. */
+export interface WeaponAttributeDef {
+  readonly name: string;
+  readonly max: string | null;
+}
+
+/** A named or exotic gear piece. Generic brand and gear set pieces are built from their set. */
+export interface GearItemDef {
+  readonly id: string;
+  readonly name: string;
+  readonly slot: GearSlot;
+  readonly rarity: "named" | "exotic";
+  /** The brand a named piece counts toward; exotics belong to none. */
+  readonly brandId: string | null;
+  readonly core: string | null;
+  readonly talent: string | null;
+  /** NinjaBike's Resourceful: counts toward every equipped set at once. */
+  readonly countsForAllSets: boolean;
 }

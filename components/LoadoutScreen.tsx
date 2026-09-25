@@ -1,16 +1,46 @@
+"use client";
+
+import {
+  GearSelect,
+  SkillSelect,
+  SpecializationSelect,
+  WeaponAttributeSelect,
+  WeaponSelect,
+} from "@/components/SlotControls";
 import { SPECIALIZATIONS_BY_ID } from "@/data/skills";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import type { BuildSource } from "@/lib/buildFormat";
 import { findViolations } from "@/lib/equipRules";
 import { hasWildcard, resolveSets, type ActiveSet } from "@/lib/setBonuses";
-import type { GearSlot, Loadout, WeaponSlot } from "@/lib/types";
 import {
-  EmptyGearCard,
-  EmptyWeaponCard,
-  GearCard,
-  SkillCard,
-  WeaponCard,
+  SKILL_SLOTS,
+  type GearSource,
+  type WeaponSource,
+} from "@/lib/loadoutEdits";
+import type {
+  EquippedSkill,
+  GearSlot,
+  Loadout,
+  WeaponSlot,
+} from "@/lib/types";
+import {
+  GearSlotCard,
+  SkillSlotCard,
+  WeaponSlotCard,
 } from "@/components/Slots";
+
+/**
+ * What the screen calls when a slot is edited. Passed only in edit mode:
+ * absent, the screen is read-only and shows no controls at all.
+ */
+export interface LoadoutEditHandlers {
+  readonly name: (name: string) => void;
+  readonly gear: (slot: GearSlot, source: GearSource) => void;
+  readonly weapon: (slot: WeaponSlot, source: WeaponSource) => void;
+  readonly weaponAttribute: (slot: WeaponSlot, name: string | null) => void;
+  readonly skill: (index: number, skill: EquippedSkill | null) => void;
+  readonly specialization: (id: string) => void;
+}
 
 /** Fixed slot order, so an incomplete loadout still renders the empty sockets. */
 const GEAR_ORDER: readonly GearSlot[] = [
@@ -71,13 +101,37 @@ const SetPanel = ({ set }: { set: ActiveSet }) => {
   );
 };
 
+/** The build name: a heading, or a text field in edit mode. */
+const Title = ({
+  name,
+  onChange,
+}: {
+  name: string;
+  onChange?: (name: string) => void;
+}) => (
+  <div className="title-row">
+    {onChange ? (
+      <input
+        className="title-input"
+        aria-label="Build name"
+        value={name}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    ) : (
+      <h1>{name || "Untitled build"}</h1>
+    )}
+  </div>
+);
+
 export const LoadoutScreen = ({
   loadout,
   source,
+  edit,
 }: {
   loadout: Loadout;
   /** Where a curated build was transcribed from, when it has a source. */
   source?: BuildSource;
+  edit?: LoadoutEditHandlers;
 }) => {
   const sets = resolveSets(loadout);
   const violations = findViolations(loadout);
@@ -91,7 +145,7 @@ export const LoadoutScreen = ({
     <main className="screen">
       <header className="masthead panel">
         <div>
-          <h1>{loadout.name}</h1>
+          <Title name={loadout.name} onChange={edit?.name} />
           {loadout.agent ? (
             <div className="agent">{loadout.agent}</div>
           ) : null}
@@ -144,36 +198,82 @@ export const LoadoutScreen = ({
       <div className="columns">
         <section className="column">
           <h2 className="column-head">Gear</h2>
-          {GEAR_ORDER.map((slot) => {
-            const piece = gearBySlot.get(slot);
-            return piece ? (
-              <GearCard key={slot} piece={piece} />
-            ) : (
-              <EmptyGearCard key={slot} slot={slot} />
-            );
-          })}
+          {GEAR_ORDER.map((slot) => (
+            <GearSlotCard
+              key={slot}
+              slot={slot}
+              piece={gearBySlot.get(slot)}
+              editor={
+                edit ? (
+                  <GearSelect
+                    slot={slot}
+                    loadout={loadout}
+                    onChange={(next) => edit.gear(slot, next)}
+                  />
+                ) : undefined
+              }
+            />
+          ))}
         </section>
 
         <section className="column">
           <h2 className="column-head">Weapons</h2>
           {WEAPON_ORDER.map((slot) => {
             const weapon = weaponsBySlot.get(slot);
-            return weapon ? (
-              <WeaponCard key={slot} weapon={weapon} />
-            ) : (
-              <EmptyWeaponCard key={slot} slot={slot} />
+            return (
+              <WeaponSlotCard
+                key={slot}
+                slot={slot}
+                weapon={weapon}
+                editor={
+                  edit ? (
+                    <>
+                      <WeaponSelect
+                        slot={slot}
+                        loadout={loadout}
+                        onChange={(next) => edit.weapon(slot, next)}
+                      />
+                      {weapon ? (
+                        <WeaponAttributeSelect
+                          weapon={weapon}
+                          onChange={(name) => edit.weaponAttribute(slot, name)}
+                        />
+                      ) : null}
+                    </>
+                  ) : undefined
+                }
+              />
             );
           })}
 
           <h2 className="column-head" style={{ marginTop: 10 }}>
             Skills
           </h2>
-          {loadout.skills.length === 0 ? (
+          {edit ? (
+            // Every filled slot plus one empty one to add to, up to the limit.
+            Array.from(
+              { length: Math.min(loadout.skills.length + 1, SKILL_SLOTS) },
+              (_, i) => (
+                <SkillSlotCard
+                  key={`skill-${i}`}
+                  index={i}
+                  skill={loadout.skills[i]}
+                  editor={
+                    <SkillSelect
+                      skill={loadout.skills[i]}
+                      onChange={(next) => edit.skill(i, next)}
+                    />
+                  }
+                />
+              ),
+            )
+          ) : loadout.skills.length === 0 ? (
             <p className="empty-note">No skills set.</p>
-          ) : null}
-          {loadout.skills.map((skill, i) => (
-            <SkillCard key={`${skill.platformId}-${i}`} skill={skill} index={i} />
-          ))}
+          ) : (
+            loadout.skills.map((skill, i) => (
+              <SkillSlotCard key={`skill-${i}`} index={i} skill={skill} />
+            ))
+          )}
         </section>
       </div>
 
@@ -199,11 +299,23 @@ export const LoadoutScreen = ({
         ) : null}
       </section>
 
-      {spec ? (
+      {spec || edit ? (
         <section className="spec panel">
-          <h2>Specialization</h2>
-          <div className="spec-name">{spec.name}</div>
-          {spec.passives.length > 0 ? (
+          <div className="panel-head">
+            <h2>Specialization</h2>
+          </div>
+          {edit ? (
+            <div className="slot-editor">
+              <SpecializationSelect
+                specializationId={loadout.specializationId}
+                onChange={edit.specialization}
+              />
+            </div>
+          ) : null}
+          <div className={`spec-name${spec ? "" : " is-none"}`}>
+            {spec ? spec.name : "None"}
+          </div>
+          {spec && spec.passives.length > 0 ? (
             <ul className="passives">
               {spec.passives.map((passive) => (
                 <li key={passive}>{passive}</li>
@@ -215,8 +327,8 @@ export const LoadoutScreen = ({
 
       <footer className="colophon">
         <p>
-          Curated builds live in <code>data/builds/</code>. Edits in the pickers
-          above are not saved; a reload restores the build.
+          Curated builds live in <code>data/builds/</code>. Edits made here are
+          not saved; a reload restores the build.
         </p>
         <p>
           Set and skill data generated from{" "}

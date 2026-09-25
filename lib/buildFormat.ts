@@ -15,6 +15,7 @@
 import { BRANDS_BY_ID } from "@/data/brands";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
 import { SKILL_PLATFORMS_BY_ID, SPECIALIZATIONS_BY_ID } from "@/data/skills";
+import { WEAPON_ATTRIBUTES } from "@/data/weaponAttributes";
 import type {
   Attribute,
   EquippedSkill,
@@ -202,6 +203,17 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
         } else mods = w.mods;
       }
 
+      // Only the third attribute is stored; the two cores follow from the type.
+      const wAttributes = attributes(w.attributes, `${path}.attributes`);
+      if (wAttributes && wAttributes.length > 1) {
+        fail(`${path}.attributes`, "a weapon rolls one attribute besides its cores");
+      }
+      wAttributes?.forEach((a, j) => {
+        if (!WEAPON_ATTRIBUTES.some((known) => known.name === a.name)) {
+          fail(`${path}.attributes[${j}].name`, `unknown weapon attribute "${a.name}"`);
+        }
+      });
+
       if (wName && oneOf(WEAPON_TYPES, w.type) && oneOf(RARITIES, w.rarity)) {
         weapons.push({
           slot: w.slot,
@@ -210,7 +222,7 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
           rarity: w.rarity,
           ...(damage ? { damage } : {}),
           ...(talent ? { talent } : {}),
-          ...(w.attributes !== undefined ? { attributes: attributes(w.attributes, `${path}.attributes`) } : {}),
+          ...(wAttributes ? { attributes: wAttributes } : {}),
           ...(mods ? { mods } : {}),
         });
       }
