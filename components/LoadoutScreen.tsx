@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import {
   GearSelect,
   SkillSelect,
@@ -24,15 +23,14 @@ import type {
   WeaponSlot,
 } from "@/lib/types";
 import {
-  EditToggle,
   GearSlotCard,
   SkillSlotCard,
   WeaponSlotCard,
 } from "@/components/Slots";
 
 /**
- * What the screen calls when a slot is edited in place. Absent, the screen is
- * read-only and shows no edit controls.
+ * What the screen calls when a slot is edited. Passed only in edit mode:
+ * absent, the screen is read-only and shows no controls at all.
  */
 export interface LoadoutEditHandlers {
   readonly name: (name: string) => void;
@@ -101,41 +99,27 @@ const SetPanel = ({ set }: { set: ActiveSet }) => {
   );
 };
 
-/** The build name, editable in place like every slot. */
+/** The build name: a heading, or a text field in edit mode. */
 const Title = ({
   name,
   onChange,
 }: {
   name: string;
   onChange?: (name: string) => void;
-}) => {
-  const [editing, setEditing] = useState(false);
-  return (
-    <div className="title-row">
-      {editing && onChange ? (
-        <input
-          className="title-input"
-          aria-label="Build name"
-          value={name}
-          autoFocus
-          onChange={(e) => onChange(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === "Escape") setEditing(false);
-          }}
-        />
-      ) : (
-        <h1>{name || "Untitled build"}</h1>
-      )}
-      {onChange ? (
-        <EditToggle
-          label="build name"
-          editing={editing}
-          onToggle={() => setEditing((e) => !e)}
-        />
-      ) : null}
-    </div>
-  );
-};
+}) => (
+  <div className="title-row">
+    {onChange ? (
+      <input
+        className="title-input"
+        aria-label="Build name"
+        value={name}
+        onChange={(e) => onChange(e.target.value)}
+      />
+    ) : (
+      <h1>{name || "Untitled build"}</h1>
+    )}
+  </div>
+);
 
 export const LoadoutScreen = ({
   loadout,
@@ -147,7 +131,6 @@ export const LoadoutScreen = ({
   source?: BuildSource;
   edit?: LoadoutEditHandlers;
 }) => {
-  const [editingSpec, setEditingSpec] = useState(false);
   const sets = resolveSets(loadout);
   const violations = findViolations(loadout);
   const spec = loadout.specializationId
@@ -307,16 +290,8 @@ export const LoadoutScreen = ({
         <section className="spec panel">
           <div className="panel-head">
             <h2>Specialization</h2>
-            {edit ? (
-              <EditToggle
-                label="specialization"
-                editing={editingSpec}
-                empty={!spec}
-                onToggle={() => setEditingSpec((e) => !e)}
-              />
-            ) : null}
           </div>
-          {editingSpec && edit ? (
+          {edit ? (
             <div className="slot-editor">
               <SpecializationSelect
                 specializationId={loadout.specializationId}

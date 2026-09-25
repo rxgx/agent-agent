@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { BRANDS_BY_ID } from "@/data/brands";
 import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
@@ -29,34 +29,11 @@ export const WEAPON_SLOT_LABELS: Record<WeaponSlot, string> = {
   sidearm: "Sidearm",
 };
 
-/** The Edit / Done button a card, panel or title shows when it can be edited. */
-export const EditToggle = ({
-  label,
-  editing,
-  empty,
-  onToggle,
-}: {
-  label: string;
-  editing: boolean;
-  empty?: boolean;
-  onToggle: () => void;
-}) => (
-  <button
-    type="button"
-    className="edit-toggle"
-    aria-expanded={editing}
-    aria-label={`${editing ? "Finish editing" : empty ? "Add" : "Edit"} ${label}`}
-    onClick={onToggle}
-  >
-    {editing ? "Done" : empty ? "Add" : "Edit"}
-  </button>
-);
-
 /**
- * Card chrome shared by every slot: the slot label, the edit toggle, and the
- * controls while editing. Each slot renders one shell whether it is filled or
- * empty, so emptying a slot mid-edit keeps its controls open instead of
- * swapping in a different component and losing them.
+ * Card chrome shared by every slot: the slot label, and the slot's controls
+ * while the screen is in edit mode. Each slot renders one shell whether it is
+ * filled or empty, so emptying a slot while editing keeps its controls in
+ * place instead of swapping in a different component.
  */
 const SlotShell = ({
   label,
@@ -68,31 +45,20 @@ const SlotShell = ({
   label: string;
   rarity?: string;
   empty: boolean;
+  /** Present only in edit mode. */
   editor?: ReactNode;
   children: ReactNode;
-}) => {
-  const [editing, setEditing] = useState(false);
-
-  return (
-    <article
-      className={`item ${empty ? "is-empty" : `rarity-${rarity}`}${editing ? " is-editing" : ""}`}
-    >
-      <div className="slot-head">
-        <span className="item-slot">{label}</span>
-        {editor ? (
-          <EditToggle
-            label={label}
-            editing={editing}
-            empty={empty}
-            onToggle={() => setEditing((e) => !e)}
-          />
-        ) : null}
-      </div>
-      {editing && editor ? <div className="slot-editor">{editor}</div> : null}
-      {children}
-    </article>
-  );
-};
+}) => (
+  <article
+    className={`item ${empty ? "is-empty" : `rarity-${rarity}`}${editor ? " is-editing" : ""}`}
+  >
+    <div className="slot-head">
+      <span className="item-slot">{label}</span>
+    </div>
+    {editor ? <div className="slot-editor">{editor}</div> : null}
+    {children}
+  </article>
+);
 
 const AttributeList = ({ items }: { items?: readonly Attribute[] }) =>
   items && items.length > 0 ? (

@@ -27,10 +27,11 @@ is a ToS and ban-risk problem — don't.
 ## Current state
 
 Curated builds, editable, but nothing persists. Each build in `data/builds/`
-has its own page at `/builds/<id>`, and `/` shows the first one. Every slot is
-edited in place: each gear, weapon and skill card, the specialization panel and
-the build name have an **Edit** toggle, and the set bonuses re-resolve live. A
-reload restores the curated build.
+has its own page at `/builds/<id>`, and `/` shows the first one. The toolbar's
+**Edit** button switches the screen into edit mode: every gear, weapon and skill
+card, the specialization panel and the build name show their controls at once,
+on the cards themselves, and the set bonuses re-resolve live. **Done** switches
+back. A reload restores the curated build.
 
 ```
 app/layout.tsx                 fonts + html shell

@@ -39,9 +39,10 @@ const toBuildFile = (base: BuildFile, loadout: Loadout): BuildFile => {
 };
 
 /**
- * Holds the loadout being edited. Editing happens in place on the screen's own
- * cards; this component owns only the state and a toolbar for choosing a
- * build, resetting it, and copying it out as JSON.
+ * Holds the loadout being edited. The toolbar's Edit button switches the whole
+ * screen into edit mode, where every slot shows its controls at once on its
+ * own card; Done switches back to the plain character screen. The toolbar also
+ * chooses a build, resets it, and copies it out as JSON.
  *
  * Nothing persists yet — a reload restores the curated build.
  */
@@ -49,6 +50,7 @@ export const LoadoutEditor = ({ build }: { build: BuildFile }) => {
   const router = useRouter();
   const [loadout, setLoadout] = useState<Loadout>(build.loadout);
   const [copyStatus, setCopyStatus] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
   const dirty = loadout !== build.loadout;
 
   const edit: LoadoutEditHandlers = {
@@ -98,10 +100,6 @@ export const LoadoutEditor = ({ build }: { build: BuildFile }) => {
             </select>
           </label>
 
-          <p className="toolbar-hint">
-            Use <b>Edit</b> on any slot to change it in place.
-          </p>
-
           <div className="editor-actions">
             {dirty ? (
               <button
@@ -112,6 +110,14 @@ export const LoadoutEditor = ({ build }: { build: BuildFile }) => {
                 Reset
               </button>
             ) : null}
+            <button
+              type="button"
+              className={`action${editing ? " is-active" : ""}`}
+              aria-pressed={editing}
+              onClick={() => setEditing((e) => !e)}
+            >
+              {editing ? "Done" : "Edit"}
+            </button>
             <button type="button" className="action" onClick={copyJson}>
               Copy JSON
             </button>
@@ -125,7 +131,11 @@ export const LoadoutEditor = ({ build }: { build: BuildFile }) => {
         </div>
       </div>
 
-      <LoadoutScreen loadout={loadout} source={build.source} edit={edit} />
+      <LoadoutScreen
+        loadout={loadout}
+        source={build.source}
+        edit={editing ? edit : undefined}
+      />
     </>
   );
 };

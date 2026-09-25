@@ -551,17 +551,6 @@ body {
   font-weight: 600;
 }
 
-.toolbar-hint {
-  margin: 0 0 7px;
-  font-size: 12px;
-  color: var(--text-faint);
-}
-
-.toolbar-hint b {
-  color: var(--accent);
-  font-weight: 600;
-}
-
 .editor-actions {
   display: flex;
   gap: 8px;
@@ -584,8 +573,14 @@ body {
   background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 
-.action:focus-visible,
-.edit-toggle:focus-visible {
+/* Edit mode on: the button reads as a pressed toggle. */
+.action.is-active {
+  color: var(--bg);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.action:focus-visible {
   outline: 1px solid var(--accent);
   outline-offset: 1px;
 }
@@ -640,29 +635,6 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.slot-head .edit-toggle,
-.panel-head .edit-toggle {
-  margin-left: auto;
-}
-
-.edit-toggle {
-  font-family: var(--font-mono);
-  font-size: 9.5px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--text-faint);
-  background: transparent;
-  border: 1px solid var(--line);
-  padding: 2px 8px;
-  cursor: pointer;
-}
-
-.edit-toggle:hover,
-.edit-toggle[aria-expanded="true"] {
-  color: var(--accent);
-  border-color: var(--accent-dim);
 }
 
 .slot-editor {
