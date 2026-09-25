@@ -43,6 +43,7 @@ components/SlotPickers.tsx     gear / skill / specialization selects
 data/brands.ts                 37 brand sets, 1/2/3-piece bonuses   (generated)
 data/gearSets.ts               28 gear sets, 2/3-piece + talents    (generated)
 data/skills.ts                 skill platforms, variants, specs     (generated)
+data/items.ts                  named + exotic items             (hand-maintained)
 data/builds/*.json             curated builds, one file each
 data/builds/index.ts           build list; validates every build at build time
 lib/types.ts                   loadout schema
@@ -69,6 +70,12 @@ upstream's `main` holds; at time of writing that is patch **Y8S3 / TU30 / 2.34**
 
 A title update is therefore a re-run, not a re-read of a guide. Do not edit the
 generated files by hand; change the script.
+
+The exception is `data/items.ts`: named and exotic items (Iron Will, Prima
+Donna, Memento…). Upstream emits none, so they are hand-entered as curated
+builds need them. The script does not touch that file. Every named or exotic
+item a build uses must be listed there, in the right slot or weapon class, and
+a talent recorded there must match the build's.
 
 Upstream carries occasional spreadsheet typos in talent and passive names
 (`Emegency Cleanse`, `Siganture`). These are reproduced faithfully rather than
@@ -153,6 +160,12 @@ when it loads, which happens during `next build`. A malformed file, a brand or
 gear set id that a data regeneration removed, a mismatched filename, or an
 illegal build fails the build — and so CI — instead of shipping.
 
+A slot can list **alternates** — other pieces or weapons the build accepts
+there, such as the SR-1 for the Model 700. They are shown on the card but never
+counted: set bonuses and equip rules see only the equipped piece. Each
+alternate is swapped in and checked against the equip rules at load, so an
+exotic alternate beside an equipped exotic fails the build.
+
 The same format is intended for builds saved in the browser and for JSON
 import/export, so a build moves between all three without conversion.
 
@@ -181,6 +194,10 @@ bad import or hand-edited loadout is flagged instead of rendering as if valid.
   weapons, exotics and playstyle notes are in; its sidearm, skills,
   specialization, rolled attributes, mods and chest talent are not yet.
   Those fields are left empty rather than guessed.
+- **Iron Will Hotshot** leaves the Prima Donna's talent, the Melon Baller's
+  brand and core, the Iron Will's core, and the sidearm unrecorded. Its gear
+  mods put Headshot Damage in every slot as specified.
+- Alternates are not editable in the pickers; changing a slot drops them.
 - The NinjaBike Wildcard Demo is a demonstration of the wildcard rule, not a
   recommended build.
 

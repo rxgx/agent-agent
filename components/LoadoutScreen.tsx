@@ -118,7 +118,10 @@ export const LoadoutScreen = ({
 
       {loadout.notes || source ? (
         <section className="build-notes panel">
-          {loadout.notes ? <p>{loadout.notes}</p> : null}
+          {/* A blank line in the notes starts a new paragraph. */}
+          {loadout.notes?.split(/\n{2,}/).map((para) => (
+            <p key={para}>{para}</p>
+          ))}
           {source ? (
             <p className="build-source">
               Source: <a href={source.url}>{source.label}</a>

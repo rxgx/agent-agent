@@ -58,10 +58,33 @@ const Mods = ({ mods }: { mods?: readonly string[] }) =>
     </ul>
   ) : null;
 
+/** A generic piece's name is its brand or set's. */
+const sourceName = (piece: GearPiece) =>
+  (piece.gearSetId ? GEAR_SETS_BY_ID.get(piece.gearSetId) : undefined)?.name ??
+  (piece.brandId ? BRANDS_BY_ID.get(piece.brandId) : undefined)?.name;
+
+/**
+ * Other items the build accepts in this slot. Listed by name and talent only:
+ * they are options, not equipped, so nothing else about them is counted.
+ */
+const Alternates = ({
+  items,
+}: {
+  items?: readonly { key: string; name: string; talent?: string }[];
+}) =>
+  items && items.length > 0 ? (
+    <ul className="alternates">
+      {items.map((alt) => (
+        <li key={alt.key}>
+          <span className="alt-or">or</span> {alt.name}
+          {alt.talent ? <span className="alt-talent"> · {alt.talent}</span> : null}
+        </li>
+      ))}
+    </ul>
+  ) : null;
+
 export const GearCard = ({ piece }: { piece: GearPiece }) => {
-  const set = piece.gearSetId ? GEAR_SETS_BY_ID.get(piece.gearSetId) : undefined;
-  const brand = piece.brandId ? BRANDS_BY_ID.get(piece.brandId) : undefined;
-  const source = set?.name ?? brand?.name;
+  const source = sourceName(piece);
 
   // An item with its own name shows it; otherwise the brand or set is the name.
   const title = piece.name ?? source ?? "Empty";
@@ -93,6 +116,13 @@ export const GearCard = ({ piece }: { piece: GearPiece }) => {
       <AttributeList items={piece.attributes} />
       {piece.talent ? <div className="talent">{piece.talent}</div> : null}
       <Mods mods={piece.mod ? [piece.mod] : undefined} />
+      <Alternates
+        items={piece.alternates?.map((alt, i) => ({
+          key: `${i}`,
+          name: alt.name ?? sourceName(alt) ?? "Unknown",
+          talent: alt.talent,
+        }))}
+      />
     </article>
   );
 };
@@ -115,6 +145,13 @@ export const WeaponCard = ({ weapon }: { weapon: Weapon }) => (
     <AttributeList items={weapon.attributes} />
     {weapon.talent ? <div className="talent">{weapon.talent}</div> : null}
     <Mods mods={weapon.mods} />
+    <Alternates
+      items={weapon.alternates?.map((alt, i) => ({
+        key: `${i}`,
+        name: alt.name,
+        talent: alt.talent,
+      }))}
+    />
   </article>
 );
 

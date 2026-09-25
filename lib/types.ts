@@ -60,6 +60,12 @@ export interface GearPiece {
    * talent counts it toward every equipped gear and brand set at once.
    */
   readonly countsForAllSets?: boolean;
+  /**
+   * Other pieces a build accepts in this slot, in order of preference. They
+   * are shown beside the equipped piece but never counted: set bonuses and
+   * equip rules only ever see the piece itself.
+   */
+  readonly alternates?: readonly GearPiece[];
 }
 
 export interface Weapon {
@@ -71,6 +77,8 @@ export interface Weapon {
   readonly talent?: string;
   readonly attributes?: readonly Attribute[];
   readonly mods?: readonly string[];
+  /** As for gear: shown as options, never counted. */
+  readonly alternates?: readonly Weapon[];
 }
 
 export interface EquippedSkill {
@@ -123,3 +131,25 @@ export interface Specialization {
   readonly name: string;
   readonly passives: readonly string[];
 }
+
+/**
+ * A named or exotic item: one specific piece with its own name, as opposed to
+ * a generic brand or gear set piece. Hand-maintained in `data/items.ts`.
+ */
+export interface NamedGear {
+  readonly kind: "gear";
+  readonly name: string;
+  readonly slot: GearSlot;
+  readonly rarity: "named" | "exotic";
+  readonly talent: string | null;
+}
+
+export interface NamedWeapon {
+  readonly kind: "weapon";
+  readonly name: string;
+  readonly type: WeaponType;
+  readonly rarity: "named" | "exotic";
+  readonly talent: string | null;
+}
+
+export type NamedItem = NamedGear | NamedWeapon;
