@@ -9,7 +9,13 @@
 
 import { BRANDS_BY_ID } from "@/data/brands";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
-import type { GearPiece, GearSlot, Loadout, Rarity } from "@/lib/types";
+import type {
+  EquippedSkill,
+  GearPiece,
+  GearSlot,
+  Loadout,
+  Rarity,
+} from "@/lib/types";
 
 /** The NinjaBike backpack is the one exotic the view models, for its wildcard talent. */
 export const NINJABIKE = {
@@ -19,18 +25,26 @@ export const NINJABIKE = {
   core: "Weapon Damage",
 };
 
-/** What a gear slot is currently filled with. */
+/**
+ * What a gear slot is currently filled with.
+ *
+ * `item` is a named or exotic piece the pickers cannot build from scratch —
+ * Memento, say, which has no brand. The picker offers it only while it is the
+ * slot's current piece, so choosing it again leaves the piece untouched.
+ */
 export type GearSource =
   | { readonly kind: "empty" }
   | { readonly kind: "brand"; readonly id: string }
   | { readonly kind: "gearSet"; readonly id: string }
-  | { readonly kind: "ninjabike" };
+  | { readonly kind: "ninjabike" }
+  | { readonly kind: "item" };
 
 export const gearSourceOf = (piece: GearPiece | undefined): GearSource => {
   if (!piece) return { kind: "empty" };
   if (piece.countsForAllSets) return { kind: "ninjabike" };
   if (piece.gearSetId) return { kind: "gearSet", id: piece.gearSetId };
   if (piece.brandId) return { kind: "brand", id: piece.brandId };
+  if (piece.name) return { kind: "item" };
   return { kind: "empty" };
 };
 
@@ -42,6 +56,7 @@ export const encodeSource = (source: GearSource): string =>
 
 export const decodeSource = (value: string): GearSource => {
   if (value === "ninjabike") return { kind: "ninjabike" };
+  if (value === "item") return { kind: "item" };
   const [kind, ...rest] = value.split(":");
   const id = rest.join(":");
   if (kind === "brand" && id) return { kind: "brand", id };
@@ -49,7 +64,7 @@ export const decodeSource = (value: string): GearSource => {
   return { kind: "empty" };
 };
 
-const RARITY_FOR: Record<Exclude<GearSource["kind"], "empty">, Rarity> = {
+const RARITY_FOR: Record<Exclude<GearSource["kind"], "empty" | "item">, Rarity> = {
   brand: "highEnd",
   gearSet: "gearSet",
   ninjabike: "exotic",
@@ -71,6 +86,7 @@ const repieceSlot = (
   previous: GearPiece | undefined,
 ): GearPiece | undefined => {
   if (source.kind === "empty") return undefined;
+  if (source.kind === "item") return previous;
 
   const carried = {
     attributes: previous?.attributes,
@@ -119,19 +135,30 @@ export const setGearSource = (
   return { ...loadout, gear: next ? [...others, next] : others };
 };
 
+/** A loadout carries at most two skills, in slot order. */
+export const SKILL_SLOTS = 2;
+
+/**
+ * Fill, replace or clear a skill slot. Filling a slot past the end appends;
+ * clearing one closes the gap, as the game does with a single skill equipped.
+ */
 export const setSkill = (
   loadout: Loadout,
   index: number,
-  platformId: string,
-  variant: string,
-): Loadout => ({
-  ...loadout,
-  skills: loadout.skills.map((skill, i) =>
-    i === index ? { platformId, variant } : skill,
-  ),
-});
+  skill: EquippedSkill | null,
+): Loadout => {
+  const skills = [...loadout.skills];
+  if (skill === null) skills.splice(index, 1);
+  else if (index < skills.length) skills[index] = skill;
+  else skills.push(skill);
+  return { ...loadout, skills: skills.slice(0, SKILL_SLOTS) };
+};
 
+/** An empty id clears the specialization rather than storing "". */
 export const setSpecialization = (
   loadout: Loadout,
   specializationId: string,
-): Loadout => ({ ...loadout, specializationId });
+): Loadout => {
+  const { specializationId: _dropped, ...rest } = loadout;
+  return specializationId ? { ...rest, specializationId } : rest;
+};

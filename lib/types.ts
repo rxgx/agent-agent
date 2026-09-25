@@ -3,7 +3,7 @@
  *
  * Deliberately shaped as the target for an import layer rather than for this
  * view: every field a picker or an OCR pass would eventually write exists here,
- * even where the static sample leaves it undefined. Optional means "not
+ * even where a curated build leaves it undefined. Optional means "not
  * captured yet", not "not applicable".
  */
 
@@ -82,7 +82,8 @@ export interface Loadout {
   readonly name: string;
   readonly agent?: string;
   readonly watchLevel?: number;
-  readonly specializationId: string;
+  /** Absent when a build's source does not state one. */
+  readonly specializationId?: string;
   readonly skillTier?: number;
   readonly gear: readonly GearPiece[];
   readonly weapons: readonly Weapon[];
