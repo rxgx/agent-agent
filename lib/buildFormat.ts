@@ -14,15 +14,15 @@
 
 import { BRANDS_BY_ID } from "@/data/brands";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
-import { NAMED_ITEMS_BY_NAME } from "@/data/items";
+import { GEAR_ITEMS, WEAPONS } from "@/data/items";
 import { SKILL_PLATFORMS_BY_ID, SPECIALIZATIONS_BY_ID } from "@/data/skills";
+import { WEAPON_ATTRIBUTES } from "@/data/weaponAttributes";
 import type {
   Attribute,
   EquippedSkill,
   GearPiece,
   GearSlot,
   Loadout,
-  NamedItem,
   Rarity,
   Weapon,
   WeaponSlot,
@@ -140,24 +140,6 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
    * weapon class, with the talent recorded there. Generic pieces are checked
    * against their brand or gear set instead.
    */
-  const namedItem = (
-    path: string,
-    rarity: Rarity,
-    itemName: string | undefined,
-    talent: string | undefined,
-    matches: (item: NamedItem) => string | undefined,
-  ) => {
-    if (!itemName || (rarity !== "named" && rarity !== "exotic")) return;
-    const item = NAMED_ITEMS_BY_NAME.get(itemName);
-    if (!item) return fail(`${path}.name`, `unknown ${rarity} item "${itemName}" — add it to data/items.ts`);
-    if (item.rarity !== rarity) fail(`${path}.rarity`, `"${itemName}" is ${item.rarity}`);
-    const mismatch = matches(item);
-    if (mismatch) fail(path, mismatch);
-    if (talent && item.talent && talent !== item.talent) {
-      fail(`${path}.talent`, `"${itemName}" has talent "${item.talent}"`);
-    }
-  };
-
   const alternatesOf = <T,>(
     v: unknown,
     path: string,
@@ -199,14 +181,16 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
     if (g.countsForAllSets !== undefined && typeof g.countsForAllSets !== "boolean") {
       fail(`${path}.countsForAllSets`, "must be a boolean");
     }
-    if (oneOf(RARITIES, g.rarity)) {
-      namedItem(path, g.rarity, itemName, talent, (item) =>
-        item.kind !== "gear"
-          ? `"${item.name}" is a weapon`
-          : item.slot !== g.slot
-            ? `"${item.name}" is a ${item.slot} piece`
-            : undefined,
-      );
+    if (itemName && (g.rarity === "named" || g.rarity === "exotic")) {
+      const item = GEAR_ITEMS.find((known) => known.name === itemName);
+      if (!item) fail(`${path}.name`, `unknown ${g.rarity} item "${itemName}"`);
+      else {
+        if (item.rarity !== g.rarity) fail(`${path}.rarity`, `"${itemName}" is ${item.rarity}`);
+        if (item.slot !== g.slot) fail(path, `"${itemName}" is a ${item.slot} piece`);
+        if (talent && item.talent && talent !== item.talent) {
+          fail(`${path}.talent`, `"${itemName}" has talent "${item.talent}"`);
+        }
+      }
     }
     const alternates = alternatesOf(g.alternates, `${path}.alternates`, slot !== undefined, (a, p) =>
       gearPiece(a, p, g.slot as GearSlot),
@@ -247,15 +231,29 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
         fail(`${path}.mods`, "must be an array of strings");
       } else mods = w.mods;
     }
-    if (oneOf(RARITIES, w.rarity)) {
-      namedItem(path, w.rarity, wName, talent, (item) =>
-        item.kind !== "weapon"
-          ? `"${item.name}" is a gear piece`
-          : item.type !== w.type
-            ? `"${item.name}" is a ${item.type}`
-            : undefined,
-      );
+    if (wName && (w.rarity === "named" || w.rarity === "exotic")) {
+      const item = WEAPONS.find((known) => known.name === wName);
+      if (!item) fail(`${path}.name`, `unknown ${w.rarity} item "${wName}"`);
+      else {
+        if (item.rarity !== w.rarity) fail(`${path}.rarity`, `"${wName}" is ${item.rarity}`);
+        if (item.type !== w.type) fail(path, `"${wName}" is a ${item.type}`);
+        if (talent && item.talent && talent !== item.talent) {
+          fail(`${path}.talent`, `"${wName}" has talent "${item.talent}"`);
+        }
+      }
     }
+
+    // Only the third attribute is stored; the two cores follow from the type.
+    const wAttributes = attributes(w.attributes, `${path}.attributes`);
+    if (wAttributes && wAttributes.length > 1) {
+      fail(`${path}.attributes`, "a weapon rolls one attribute besides its cores");
+    }
+    wAttributes?.forEach((a, j) => {
+      if (!WEAPON_ATTRIBUTES.some((known) => known.name === a.name)) {
+        fail(`${path}.attributes[${j}].name`, `unknown weapon attribute "${a.name}"`);
+      }
+    });
+
     const alternates = alternatesOf(w.alternates, `${path}.alternates`, slot !== undefined, (a, p) =>
       weapon(a, p, w.slot as WeaponSlot),
     );
@@ -268,7 +266,7 @@ export const parseBuildFile = (raw: unknown): ParseResult => {
       rarity: w.rarity,
       ...(damage ? { damage } : {}),
       ...(talent ? { talent } : {}),
-      ...(w.attributes !== undefined ? { attributes: attributes(w.attributes, `${path}.attributes`) } : {}),
+      ...(wAttributes ? { attributes: wAttributes } : {}),
       ...(mods ? { mods } : {}),
       ...(alternates ? { alternates } : {}),
     };

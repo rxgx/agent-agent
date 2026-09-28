@@ -60,11 +60,7 @@ export interface GearPiece {
    * talent counts it toward every equipped gear and brand set at once.
    */
   readonly countsForAllSets?: boolean;
-  /**
-   * Other pieces a build accepts in this slot, in order of preference. They
-   * are shown beside the equipped piece but never counted: set bonuses and
-   * equip rules only ever see the piece itself.
-   */
+  /** Other pieces a build accepts in this slot. */
   readonly alternates?: readonly GearPiece[];
 }
 
@@ -75,9 +71,13 @@ export interface Weapon {
   readonly rarity: Rarity;
   readonly damage?: string;
   readonly talent?: string;
+  /**
+   * The rolled third attribute. The two cores are fixed by `type`, so they
+   * are not stored; see `WEAPON_CORES`.
+   */
   readonly attributes?: readonly Attribute[];
   readonly mods?: readonly string[];
-  /** As for gear: shown as options, never counted. */
+  /** Other weapons a build accepts in this slot. */
   readonly alternates?: readonly Weapon[];
 }
 
@@ -132,24 +132,32 @@ export interface Specialization {
   readonly passives: readonly string[];
 }
 
-/**
- * A named or exotic item: one specific piece with its own name, as opposed to
- * a generic brand or gear set piece. Hand-maintained in `data/items.ts`.
- */
-export interface NamedGear {
-  readonly kind: "gear";
+/** A pickable weapon: a base high-end gun, or a named or exotic one. */
+export interface WeaponDef {
+  readonly id: string;
+  readonly name: string;
+  readonly type: WeaponType;
+  readonly rarity: "highEnd" | "named" | "exotic";
+  /** Talent name for named and exotic weapons; base weapons roll theirs. */
+  readonly talent: string | null;
+}
+
+/** A weapon attribute as the data knows it: its name and its best roll. */
+export interface WeaponAttributeDef {
+  readonly name: string;
+  readonly max: string | null;
+}
+
+/** A named or exotic gear piece. Generic brand and gear set pieces are built from their set. */
+export interface GearItemDef {
+  readonly id: string;
   readonly name: string;
   readonly slot: GearSlot;
   readonly rarity: "named" | "exotic";
+  /** The brand a named piece counts toward; exotics belong to none. */
+  readonly brandId: string | null;
+  readonly core: string | null;
   readonly talent: string | null;
+  /** NinjaBike's Resourceful: counts toward every equipped set at once. */
+  readonly countsForAllSets: boolean;
 }
-
-export interface NamedWeapon {
-  readonly kind: "weapon";
-  readonly name: string;
-  readonly type: WeaponType;
-  readonly rarity: "named" | "exotic";
-  readonly talent: string | null;
-}
-
-export type NamedItem = NamedGear | NamedWeapon;

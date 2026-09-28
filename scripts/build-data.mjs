@@ -1,5 +1,6 @@
 /**
- * Regenerates `data/brands.ts`, `data/gearSets.ts` and `data/skills.ts` from
+ * Regenerates `data/brands.ts`, `data/gearSets.ts`, `data/skills.ts`,
+ * `data/items.ts` and `data/weaponAttributes.ts` from
  * knowlesy/division-config, an MIT-licensed pipeline that extracts, patches and
  * validates the community build spreadsheet.
  *
@@ -46,12 +47,26 @@ const header = (meta, what) => `// GENERATED FILE — do not edit by hand.
 `;
 
 const main = async () => {
-  const [meta, brandSets, gearSets, skills, specs] = await Promise.all([
+  const [
+    meta,
+    brandSets,
+    gearSets,
+    skills,
+    specs,
+    gearNamed,
+    weaponsBase,
+    weaponsNamed,
+    attributes,
+  ] = await Promise.all([
     get("meta"),
     get("brand-sets"),
     get("gear-sets"),
     get("skills"),
     get("specializations"),
+    get("gear-named"),
+    get("weapons"),
+    get("weapons-named"),
+    get("attributes"),
   ]);
 
   // ---- brands ----------------------------------------------------------
@@ -192,10 +207,203 @@ export const SPECIALIZATIONS_BY_ID: ReadonlyMap<string, Specialization> = new Ma
 `,
   );
 
+
+  // ---- items: weapons, and named and exotic gear -----------------------
+  // Upstream spells weapon categories several ways ("ASSAULT RIFLES",
+  // "Submachine Guns", "SMG"); fold them onto the view's WeaponType union.
+  const WEAPON_TYPE = {
+    "assault rifle": "Assault Rifle",
+    "light machine gun": "LMG",
+    lmg: "LMG",
+    "submachine gun": "SMG",
+    smg: "SMG",
+    shotgun: "Shotgun",
+    rifle: "Rifle",
+    "marksman rifle": "Marksman Rifle",
+    mmr: "Marksman Rifle",
+    pistol: "Pistol",
+  };
+  const weaponType = (category) => {
+    const key = clean(category)?.toLowerCase().replace(/s$/, "");
+    const type = WEAPON_TYPE[key];
+    if (!type) throw new Error(`unknown weapon category "${category}"`);
+    return type;
+  };
+
+  const GEAR_SLOT = {
+    mask: "mask",
+    backpack: "backpack",
+    chest: "chest",
+    gloves: "gloves",
+    holster: "holster",
+    knees: "kneepads",
+  };
+
+  // Named pieces name their brand in prose, not by id, and not always as the
+  // brand list spells it ("Golan Gear" for "Golan Gear Ltd"). Match on the
+  // longest brand whose squashed name is a prefix of the other.
+  // Accents are decomposed and dropped first, so "Česká" squashes to "ceska"
+  // rather than losing the letter.
+  const squash = (x) =>
+    (clean(x) ?? "")
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "");
+  const brandIdFor = (name) => {
+    const n = squash(name);
+    if (!n) return null;
+    const hits = brands
+      .map((b) => ({ id: b.id, key: squash(b.name) }))
+      .filter((b) => b.key && (n.startsWith(b.key) || b.key.startsWith(n)))
+      .sort((a, b) => b.key.length - a.key.length);
+    return hits[0]?.id ?? null;
+  };
+
+  const titleCase = (x) =>
+    x ? x.replace(/\b[a-z]/g, (c) => c.toUpperCase()) : null;
+
+  const namedWeapons = weaponsNamed.map((w) => ({
+    id: w.id,
+    name: clean(w.name),
+    type: weaponType(w.category),
+    rarity: w.isExotic ? "exotic" : "named",
+    talent: talentName(w.talentOrPerk),
+  }));
+  // weapons.json carries stats for named guns too; the named entry wins,
+  // since it has the rarity and talent.
+  const namedNames = new Set(namedWeapons.map((w) => w.name));
+  const baseWeapons = weaponsBase
+    .filter((w) => !namedNames.has(clean(w.name)))
+    .map((w) => ({
+      id: w.id,
+      name: clean(w.name),
+      type: weaponType(w.category),
+      rarity: "highEnd",
+      talent: null,
+    }));
+  const weapons = [...baseWeapons, ...namedWeapons].sort(
+    (a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name),
+  );
+
+  const unmatchedBrands = new Set();
+  const gearItems = gearNamed.map((g) => {
+    const slot = GEAR_SLOT[clean(g.slot)?.toLowerCase()];
+    if (!slot) throw new Error(`unknown gear slot "${g.slot}" on ${g.id}`);
+    const brandId = g.isExotic ? null : brandIdFor(g.brand);
+    if (!g.isExotic && g.brand && !brandId) unmatchedBrands.add(clean(g.brand));
+    const talent = talentName(g.talent);
+    return {
+      id: g.id,
+      name: clean(g.name),
+      slot,
+      rarity: g.isExotic ? "exotic" : "named",
+      brandId,
+      core: titleCase(clean((g.coreAttribute ?? "").split("\n")[0])),
+      talent,
+      // NinjaBike's Resourceful counts toward every equipped set at once.
+      countsForAllSets: talent === "Resourceful",
+    };
+  });
+
+  for (const [label, list] of [["weapon", weapons], ["gear item", gearItems]]) {
+    const seen = new Set();
+    for (const x of list) {
+      if (seen.has(x.id)) throw new Error(`duplicate ${label} id "${x.id}"`);
+      seen.add(x.id);
+    }
+  }
+
+  await writeFile(
+    "data/items.ts",
+    `${header(meta, `${weapons.length} weapons, and ${gearItems.length} named and exotic gear pieces.`)}
+import type { GearItemDef, WeaponDef } from "@/lib/types";
+
+export const WEAPONS: readonly WeaponDef[] = [
+${weapons
+  .map(
+    (w) =>
+      `  { id: ${q(w.id)}, name: ${q(w.name)}, type: ${q(w.type)}, rarity: ${q(w.rarity)}, talent: ${q(w.talent)} },`,
+  )
+  .join("\n")}
+];
+
+export const WEAPONS_BY_ID: ReadonlyMap<string, WeaponDef> = new Map(
+  WEAPONS.map((w) => [w.id, w]),
+);
+
+export const GEAR_ITEMS: readonly GearItemDef[] = [
+${gearItems
+  .map(
+    (g) =>
+      `  { id: ${q(g.id)}, name: ${q(g.name)}, slot: ${q(g.slot)}, rarity: ${q(g.rarity)}, brandId: ${q(g.brandId)}, core: ${q(g.core)}, talent: ${q(g.talent)}, countsForAllSets: ${g.countsForAllSets} },`,
+  )
+  .join("\n")}
+];
+
+export const GEAR_ITEMS_BY_ID: ReadonlyMap<string, GearItemDef> = new Map(
+  GEAR_ITEMS.map((g) => [g.id, g]),
+);
+`,
+  );
+
+  // ---- weapon attributes ------------------------------------------------
+  // Every weapon rolls its type's damage, a second core fixed by its type
+  // (pistols have none), and one attribute from a shared list. Upstream labels
+  // cores "<type>:\n<attribute>" and abbreviates one attribute name.
+  const ATTRIBUTE_NAME = {
+    "dmg to target out of cover": "Damage to Target out of Cover",
+  };
+  const attributeName = (s) => ATTRIBUTE_NAME[clean(s).toLowerCase()] ?? clean(s);
+  const attributeDef = (a, name) => ({ name, max: clean(a.rawMax) });
+
+  let damageCore;
+  const secondCores = new Map();
+  for (const a of [...attributes.weaponCore, ...attributes.weaponSecondaryFixed]) {
+    const [label, attr] = a.name.split("\n").map(clean);
+    const scope = label.replace(/:$/, "");
+    if (scope.toLowerCase() === "all weapons") damageCore = a;
+    else secondCores.set(weaponType(scope), attr === "NA" ? null : attributeDef(a, attributeName(attr)));
+  }
+  if (!damageCore) throw new Error("no weapon damage core in attributes.json");
+  const weaponCores = Object.fromEntries(
+    [...new Set(Object.values(WEAPON_TYPE))].map((type) => {
+      if (!secondCores.has(type)) throw new Error(`no second core for ${type}`);
+      const second = secondCores.get(type);
+      return [type, [attributeDef(damageCore, `${type} Damage`), ...(second ? [second] : [])]];
+    }),
+  );
+  const weaponMinors = attributes.weaponMinors.map((a) => attributeDef(a, attributeName(a.name)));
+
+  const attrLiteral = (a) => `{ name: ${q(a.name)}, max: ${q(a.max)} }`;
+  await writeFile(
+    "data/weaponAttributes.ts",
+    `${header(meta, `Weapon cores by type, and the ${weaponMinors.length} attributes a weapon can roll.`)}
+import type { WeaponAttributeDef, WeaponType } from "@/lib/types";
+
+/** Fixed by weapon type: its damage, then a second core (none on pistols). */
+export const WEAPON_CORES: Readonly<Record<WeaponType, readonly WeaponAttributeDef[]>> = {
+${Object.entries(weaponCores)
+  .map(([type, cores]) => `  ${q(type)}: [${cores.map(attrLiteral).join(", ")}],`)
+  .join("\n")}
+};
+
+/** The third attribute: one roll from this list. */
+export const WEAPON_ATTRIBUTES: readonly WeaponAttributeDef[] = [
+${weaponMinors.map((a) => `  ${attrLiteral(a)},`).join("\n")}
+];
+`,
+  );
+
   console.log(
     `patch ${meta.patch}: ${brands.length} brands, ${sets.length} gear sets, ` +
-      `${platforms.length} skill platforms, ${specializations.length} specializations`,
+      `${platforms.length} skill platforms, ${specializations.length} specializations, ` +
+      `${weapons.length} weapons, ${gearItems.length} named/exotic gear pieces, ` +
+      `${weaponMinors.length} weapon attributes`,
   );
+  if (unmatchedBrands.size > 0) {
+    console.warn(`named gear with no matching brand: ${[...unmatchedBrands].join(", ")}`);
+  }
 };
 
 main().catch((err) => {

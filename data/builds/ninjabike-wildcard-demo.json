@@ -92,8 +92,7 @@
       },
       {
         "slot": "holster",
-        "name": "Fox's Prayer",
-        "rarity": "named",
+        "rarity": "highEnd",
         "brandId": "grupo-sombra-s-a-",
         "core": {
           "name": "Weapon Damage",
@@ -104,8 +103,7 @@
             "name": "Critical Hit Damage",
             "value": "12.0%"
           }
-        ],
-        "talent": "Perfectly Opportunistic"
+        ]
       },
       {
         "slot": "kneepads",
@@ -138,8 +136,7 @@
         "talent": "Actum Est",
         "attributes": [
           {
-            "name": "Rate of Fire",
-            "value": "700 RPM"
+            "name": "Rate of Fire"
           }
         ],
         "mods": [
@@ -157,8 +154,7 @@
         "talent": "Perfectly Vindictive",
         "attributes": [
           {
-            "name": "Magazine",
-            "value": "50"
+            "name": "Magazine Size"
           }
         ],
         "mods": [
