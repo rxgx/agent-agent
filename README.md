@@ -86,6 +86,11 @@ Upstream carries occasional spreadsheet typos in talent and passive names
 silently patched — corrections belong upstream, or in a local overlay in the
 script, so they survive the next regeneration.
 
+Items newer than upstream's data go in that overlay too:
+`LOCAL_NAMED_WEAPONS` in the script is merged into `data/items.ts` on every
+run. Once upstream carries an item of the same name, upstream's entry wins and
+the run warns that the local one can go.
+
 [kc]: https://github.com/knowlesy/division-config
 
 ## Design decisions
@@ -207,8 +212,9 @@ everything else.
   Target out of Cover) and playstyle notes are in; its gear attributes, the
   ACS-12's and Quickstep's third attributes, mods and chest talent are not yet.
   Those fields are left empty rather than guessed.
-- **Iron Will Hotshot** leaves the Prima Donna's talent, the Melon Baller's
-  brand and core, the Iron Will's core, and the sidearm unrecorded. Its gear
+- **Iron Will Hotshot** leaves the Prima Donna's talent, the Iron Will's core,
+  and the sidearm unrecorded. Prima Donna is newer than upstream's data, so it
+  comes from the local overlay in `scripts/build-data.mjs`. Its gear
   mods put Headshot Damage in every slot as specified.
 - Alternates are not editable in the pickers; changing a slot drops them.
 - Decoy has a single variant in the data, "Holographic Distraction". Its name
