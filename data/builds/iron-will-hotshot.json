@@ -1,0 +1,127 @@
+{
+  "version": 1,
+  "id": "iron-will-hotshot",
+  "loadout": {
+    "name": "Iron Will Hotshot",
+    "specializationId": "sharpshooter",
+    "gear": [
+      {
+        "slot": "mask",
+        "rarity": "gearSet",
+        "gearSetId": "hotshot",
+        "core": {
+          "name": "Weapon Damage"
+        },
+        "attributes": [
+          {
+            "name": "Headshot Damage"
+          }
+        ],
+        "mod": "Headshot Damage"
+      },
+      {
+        "slot": "chest",
+        "name": "Iron Will",
+        "rarity": "exotic",
+        "talent": "Resolved",
+        "mod": "Headshot Damage"
+      },
+      {
+        "slot": "backpack",
+        "name": "Melon Baller",
+        "rarity": "named",
+        "talent": "Vigilance",
+        "mod": "Headshot Damage",
+        "alternates": [
+          {
+            "slot": "backpack",
+            "rarity": "highEnd",
+            "brandId": "airaldi-holdings",
+            "core": {
+              "name": "Weapon Damage"
+            },
+            "talent": "Vigilance",
+            "mod": "Headshot Damage"
+          }
+        ]
+      },
+      {
+        "slot": "gloves",
+        "rarity": "gearSet",
+        "gearSetId": "hotshot",
+        "core": {
+          "name": "Weapon Damage"
+        },
+        "attributes": [
+          {
+            "name": "Headshot Damage"
+          }
+        ],
+        "mod": "Headshot Damage"
+      },
+      {
+        "slot": "holster",
+        "rarity": "gearSet",
+        "gearSetId": "hotshot",
+        "core": {
+          "name": "Weapon Damage"
+        },
+        "attributes": [
+          {
+            "name": "Headshot Damage"
+          }
+        ],
+        "mod": "Headshot Damage"
+      },
+      {
+        "slot": "kneepads",
+        "rarity": "gearSet",
+        "gearSetId": "hotshot",
+        "core": {
+          "name": "Weapon Damage"
+        },
+        "attributes": [
+          {
+            "name": "Headshot Damage"
+          }
+        ],
+        "mod": "Headshot Damage"
+      }
+    ],
+    "weapons": [
+      {
+        "slot": "primary",
+        "name": "Prima Donna",
+        "type": "Marksman Rifle",
+        "rarity": "exotic"
+      },
+      {
+        "slot": "secondary",
+        "name": "Model 700",
+        "type": "Marksman Rifle",
+        "rarity": "highEnd",
+        "talent": "Ranger",
+        "alternates": [
+          {
+            "slot": "secondary",
+            "name": "SR-1",
+            "type": "Marksman Rifle",
+            "rarity": "highEnd",
+            "talent": "Ranger"
+          }
+        ]
+      }
+    ],
+    "skills": [
+      {
+        "platformId": "decoy",
+        "variant": "Holographic Distraction"
+      },
+      {
+        "platformId": "hive",
+        "variant": "Reviver"
+      }
+    ],
+    "notes": "Red Horizon season sniper build: 4-piece Hotshot with Headshot Damage on every piece and every mod, around Iron Will. Its Resolved talent treats your next body shot as a headshot in PvE, on a 2-second cooldown, and needs no headshot kill to start.\n\nPlay loop: let Resolved convert a body shot, and land real headshots while it is on cooldown. Save the converted shot for Elites.\n\nSecondary talent: Ranger, or another direct-damage talent.\n\nAlternative: a Model 700 Headhunter build (Chainkiller chest, Determined on the rifle) has a higher ceiling for accurate players. Determined changed this season: a real headshot kill prepares one converted headshot, and a kill with that converted shot does not retrigger it."
+  }
+}

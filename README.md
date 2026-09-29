@@ -164,6 +164,12 @@ when it loads, which happens during `next build`. A malformed file, a brand or
 gear set id that a data regeneration removed, a mismatched filename, or an
 illegal build fails the build — and so CI — instead of shipping.
 
+A slot can list **alternates** — other pieces or weapons the build accepts
+there, such as the SR-1 for the Model 700. They are shown on the card but never
+counted: set bonuses and equip rules see only the equipped piece. Each
+alternate is swapped in and checked against the equip rules at load, so an
+exotic alternate beside an equipped exotic fails the build.
+
 The same format is intended for builds saved in the browser and for JSON
 import/export, so a build moves between all three without conversion.
 
@@ -199,8 +205,12 @@ everything else.
   weapons (including the Quickstep sidearm), exotics, skills (Crusader Shield
   and Decoy), Gunner specialization, St. Elmo's third attribute (Damage to
   Target out of Cover) and playstyle notes are in; its gear attributes, the
-  ACS-12's and Quickstep's third attributes, mods and chest talent are not yet. Those fields are left empty
-  rather than guessed.
+  ACS-12's and Quickstep's third attributes, mods and chest talent are not yet.
+  Those fields are left empty rather than guessed.
+- **Iron Will Hotshot** leaves the Prima Donna's talent, the Melon Baller's
+  brand and core, the Iron Will's core, and the sidearm unrecorded. Its gear
+  mods put Headshot Damage in every slot as specified.
+- Alternates are not editable in the pickers; changing a slot drops them.
 - Decoy has a single variant in the data, "Holographic Distraction". Its name
   is among the Decoy, Trap and Sticky Bomb variants still to verify.
 - The NinjaBike Wildcard Demo is a demonstration of the wildcard rule, not a

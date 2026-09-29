@@ -60,6 +60,8 @@ export interface GearPiece {
    * talent counts it toward every equipped gear and brand set at once.
    */
   readonly countsForAllSets?: boolean;
+  /** Other pieces a build accepts in this slot. */
+  readonly alternates?: readonly GearPiece[];
 }
 
 export interface Weapon {
@@ -75,6 +77,8 @@ export interface Weapon {
    */
   readonly attributes?: readonly Attribute[];
   readonly mods?: readonly string[];
+  /** Other weapons a build accepts in this slot. */
+  readonly alternates?: readonly Weapon[];
 }
 
 export interface EquippedSkill {

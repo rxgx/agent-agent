@@ -6,17 +6,20 @@
  *
  * Every build is parsed and checked against the equip rules when this module
  * loads, which happens during `next build`. A malformed file, a stale brand or
- * gear set id, or an illegal build (two exotic weapons, say) fails the build,
+ * gear set id, an unknown named item, or an illegal build (two exotic
+ * weapons, say, including via an alternate) fails the build,
  * and so fails CI, instead of shipping.
  */
 
 import { parseBuildFile, type BuildFile } from "@/lib/buildFormat";
-import { findViolations } from "@/lib/equipRules";
+import { alternateLoadouts, findViolations } from "@/lib/equipRules";
+import ironWillHotshot from "./iron-will-hotshot.json";
 import ninjabikeWildcardDemo from "./ninjabike-wildcard-demo.json";
 import stElmosRedStriker from "./st-elmos-red-striker.json";
 
 const FILES: ReadonlyArray<readonly [string, unknown]> = [
   ["st-elmos-red-striker.json", stElmosRedStriker],
+  ["iron-will-hotshot.json", ironWillHotshot],
   ["ninjabike-wildcard-demo.json", ninjabikeWildcardDemo],
 ];
 
@@ -37,10 +40,16 @@ const load = (): BuildFile[] => {
     }
     if (ids.has(build.id)) problems.push(`${file}: duplicate id "${build.id}"`);
     ids.add(build.id);
-    for (const v of findViolations(build.loadout)) {
-      problems.push(
-        `${file}: illegal build — only ${v.limit} ${v.subject} allowed, has ${v.equipped.length} (${v.equipped.join(", ")})`,
-      );
+    const candidates = [
+      { swapped: undefined as string | undefined, loadout: build.loadout },
+      ...alternateLoadouts(build.loadout),
+    ];
+    for (const { swapped, loadout } of candidates) {
+      for (const v of findViolations(loadout)) {
+        problems.push(
+          `${file}: illegal build${swapped ? ` with alternate "${swapped}"` : ""} — only ${v.limit} ${v.subject} allowed, has ${v.equipped.length} (${v.equipped.join(", ")})`,
+        );
+      }
     }
     builds.push(build);
   }

@@ -54,3 +54,32 @@ export const findViolations = (loadout: Loadout): RuleViolation[] => {
 
   return violations;
 };
+
+/**
+ * Every loadout a build's alternates allow, one swap at a time, labelled by
+ * the item swapped in. Alternates are never counted by `findViolations`, so a
+ * build that lists an exotic alternate beside an equipped exotic would
+ * otherwise pass while offering an illegal swap.
+ */
+export const alternateLoadouts = (
+  loadout: Loadout,
+): { readonly swapped: string; readonly loadout: Loadout }[] => [
+  ...loadout.gear.flatMap((piece) =>
+    (piece.alternates ?? []).map((alt) => ({
+      swapped: alt.name ?? alt.brandId ?? alt.gearSetId ?? alt.slot,
+      loadout: {
+        ...loadout,
+        gear: loadout.gear.map((p) => (p === piece ? alt : p)),
+      },
+    })),
+  ),
+  ...loadout.weapons.flatMap((weapon) =>
+    (weapon.alternates ?? []).map((alt) => ({
+      swapped: alt.name,
+      loadout: {
+        ...loadout,
+        weapons: loadout.weapons.map((w) => (w === weapon ? alt : w)),
+      },
+    })),
+  ),
+];
