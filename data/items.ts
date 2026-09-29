@@ -1,7 +1,7 @@
 // GENERATED FILE — do not edit by hand.
 // Run `node scripts/build-data.mjs` to regenerate.
 //
-// 390 weapons, and 102 named and exotic gear pieces.
+// 391 weapons, and 102 named and exotic gear pieces.
 // Source: knowlesy/division-config (MIT), patch Y8S3 / TU30 / 2.34
 // Generated upstream at 2026-08-29T17:29:12.927Z
 
@@ -169,6 +169,7 @@ export const WEAPONS: readonly WeaponDef[] = [
   { id: "paratrooper-svd", name: "Paratrooper SVD", type: "Marksman Rifle", rarity: "highEnd", talent: null },
   { id: "pinprick", name: "Pinprick", type: "Marksman Rifle", rarity: "named", talent: "Perfect First Blood" },
   { id: "pinprick-covert-srs-", name: "Pinprick (Covert SRS)", type: "Marksman Rifle", rarity: "highEnd", talent: null },
+  { id: "prima-donna", name: "Prima Donna", type: "Marksman Rifle", rarity: "exotic", talent: null },
   { id: "relic", name: "Relic", type: "Marksman Rifle", rarity: "named", talent: "Perfectly Determined" },
   { id: "sacrum-imperium", name: "Sacrum Imperium", type: "Marksman Rifle", rarity: "exotic", talent: "The Trap" },
   { id: "scalpel", name: "Scalpel", type: "Marksman Rifle", rarity: "named", talent: "Future Perfection" },

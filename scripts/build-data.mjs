@@ -36,6 +36,18 @@ const talentName = (s) => {
   return first || null;
 };
 
+/**
+ * Local overlay: items newer than upstream's data, in the shape the script
+ * emits. Upstream wins once it carries an item of the same name — the run
+ * says so, and the entry should then be deleted from here.
+ *
+ * Talents are null until confirmed rather than guessed.
+ */
+const LOCAL_NAMED_WEAPONS = [
+  // Red Horizon season exotic, used by the Iron Will Hotshot build.
+  { id: "prima-donna", name: "Prima Donna", type: "Marksman Rifle", rarity: "exotic", talent: null },
+];
+
 const q = (s) => (s === null || s === undefined ? "null" : JSON.stringify(s));
 
 const header = (meta, what) => `// GENERATED FILE — do not edit by hand.
@@ -282,7 +294,13 @@ export const SPECIALIZATIONS_BY_ID: ReadonlyMap<string, Specialization> = new Ma
       rarity: "highEnd",
       talent: null,
     }));
-  const weapons = [...baseWeapons, ...namedWeapons].sort(
+  const upstreamNames = new Set([...namedNames, ...baseWeapons.map((w) => w.name)]);
+  const localWeapons = LOCAL_NAMED_WEAPONS.filter((w) => {
+    if (!upstreamNames.has(w.name)) return true;
+    console.warn(`overlay: upstream now has "${w.name}"; remove it from LOCAL_NAMED_WEAPONS`);
+    return false;
+  });
+  const weapons = [...baseWeapons, ...namedWeapons, ...localWeapons].sort(
     (a, b) => a.type.localeCompare(b.type) || a.name.localeCompare(b.name),
   );
 

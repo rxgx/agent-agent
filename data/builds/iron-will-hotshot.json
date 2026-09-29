@@ -30,7 +30,11 @@
         "slot": "backpack",
         "name": "Melon Baller",
         "rarity": "named",
-        "talent": "Vigilance",
+        "brandId": "airaldi-holdings",
+        "core": {
+          "name": "Weapon Damage"
+        },
+        "talent": "Perfect Concussion",
         "mod": "Headshot Damage",
         "alternates": [
           {
