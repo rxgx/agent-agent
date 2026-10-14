@@ -14,6 +14,14 @@
         }
       },
       {
+        "slot": "chest",
+        "rarity": "highEnd",
+        "brandId": "wyvern-wear",
+        "core": {
+          "name": "Armor"
+        }
+      },
+      {
         "slot": "backpack",
         "rarity": "highEnd",
         "brandId": "belstone-armory",
@@ -76,6 +84,6 @@
         "variant": "Artillery"
       }
     ],
-    "notes": "Transcribed from a phone photo of a Reddit screenshot (\"this dude tanked a T10 for us\"), so only what the photo shows clearly is recorded. Everything else is left empty rather than guessed.\n\nCores: Armor on the mask, backpack and chest; Skill Tier on the gloves, holster and kneepads. The mask, backpack and chest each carry a mod.\n\nStill to identify: the chest's brand, the first skill (possibly a Shield), and the remaining talents, attributes and mods.\n\nThe original is heavily invested in Quantum Prototype upgrades, which this view does not record.\n\nThe sidearm may be the named TDI \"Kard\" Custom rather than a plain Kard-45; the photo's card frame matches the high-end HK GR9, so it is recorded as high-end."
+    "notes": "Transcribed from a phone photo of a Reddit screenshot (\"this dude tanked a T10 for us\"), so only what the photo shows clearly is recorded. Everything else is left empty rather than guessed.\n\nEach piece's core is as the photo shows: Armor on the mask, backpack and chest, Skill Tier on the gloves, holster and kneepads. The mask, backpack and chest each carry a mod.\n\nStill to identify: the first skill (possibly a Shield), the chest talent, and the attributes and mods.\n\nThe original is heavily invested in Quantum Prototype upgrades, which this view does not record.\n\nThe sidearm may be the named TDI \"Kard\" Custom rather than a plain Kard-45; the photo's card frame matches the high-end HK GR9, so it is recorded as high-end."
   }
 }

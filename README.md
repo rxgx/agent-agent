@@ -217,9 +217,8 @@ everything else.
   comes from the local overlay in `scripts/build-data.mjs`. Its gear
   mods put Headshot Damage in every slot as specified.
 - **T10 Demolitionist Tank** was transcribed from a photo of a screenshot. Its
-  weapons are complete; the chest brand, the first skill and most
-  gear talents could not be read. Its notes record what the photo does show (cores, mod
-  slots, a shared brand logo) so it can be finished from a sharper image.
+  weapons and gear brands are complete; the first skill, the chest talent, and
+  the attributes and mods could not be read and are left empty.
 - Alternates are not editable in the pickers; changing a slot drops them.
 - Decoy has a single variant in the data, "Holographic Distraction". Its name
   is among the Decoy, Trap and Sticky Bomb variants still to verify.
