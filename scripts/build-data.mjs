@@ -275,13 +275,20 @@ export const SPECIALIZATIONS_BY_ID: ReadonlyMap<string, Specialization> = new Ma
   const titleCase = (x) =>
     x ? x.replace(/\b[a-z]/g, (c) => c.toUpperCase()) : null;
 
-  const namedWeapons = weaponsNamed.map((w) => ({
-    id: w.id,
-    name: clean(w.name),
-    type: weaponType(w.category),
-    rarity: w.isExotic ? "exotic" : "named",
-    talent: talentName(w.talentOrPerk),
-  }));
+  // Some named weapons' perk is a perfected attribute, not a talent
+  // (TDI "Kard" Custom, The Mop, Backup Boomstick). Their talent rolls like
+  // a base weapon's, so it is emitted as null rather than as the perk.
+  const ATTRIBUTE_PERKS = new Set(["Core Attribute", "Secondary Attribute"]);
+  const namedWeapons = weaponsNamed.map((w) => {
+    const talent = talentName(w.talentOrPerk);
+    return {
+      id: w.id,
+      name: clean(w.name),
+      type: weaponType(w.category),
+      rarity: w.isExotic ? "exotic" : "named",
+      talent: ATTRIBUTE_PERKS.has(talent) ? null : talent,
+    };
+  });
   // weapons.json carries stats for named guns too; the named entry wins,
   // since it has the rarity and talent.
   const namedNames = new Set(namedWeapons.map((w) => w.name));

@@ -74,9 +74,9 @@
       },
       {
         "slot": "sidearm",
-        "name": "Kard-45",
+        "name": "TDI \"Kard\" Custom",
         "type": "Pistol",
-        "rarity": "highEnd",
+        "rarity": "named",
         "talent": "In Sync"
       }
     ],
@@ -90,6 +90,6 @@
         "variant": "Artillery"
       }
     ],
-    "notes": "Transcribed from a phone photo of a Reddit screenshot (\"this dude tanked a T10 for us\"), so only what the photo shows clearly is recorded. Everything else is left empty rather than guessed.\n\nEach piece's core is as the photo shows: Armor on the mask, backpack and chest, Skill Tier on the gloves, holster and kneepads. The mask, backpack and chest each carry a mod.\n\nStill to identify: the attribute rolls and mods.\n\nThe original is heavily invested in Quantum Prototype upgrades, which this view does not record.\n\nThe sidearm may be the named TDI \"Kard\" Custom rather than a plain Kard-45. It is recorded as high-end because its card frame in the photo matches the high-end HK GR9."
+    "notes": "Transcribed from a phone photo of a Reddit screenshot (\"this dude tanked a T10 for us\"), so only what the photo shows clearly is recorded. Everything else is left empty rather than guessed.\n\nEach piece's core is as the photo shows: Armor on the mask, backpack and chest, Skill Tier on the gloves, holster and kneepads. The mask, backpack and chest each carry a mod.\n\nStill to identify: the attribute rolls and mods.\n\nThe original is heavily invested in Quantum Prototype upgrades, which this view does not record."
   }
 }
