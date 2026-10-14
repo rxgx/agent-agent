@@ -30,6 +30,11 @@
   --r-named: #e8c565;
   --r-exotic: #e8582a;
 
+  /* Attribute type, as the game colors it: red, blue, yellow. */
+  --t-offensive: #e04848;
+  --t-defensive: #4a90c4;
+  --t-skill: #e0b62a;
+
   --cut: 14px;
   --stripe: 3px;
 
@@ -240,7 +245,7 @@ body {
   flex: 0 0 auto;
   width: 8px;
   height: 8px;
-  background: var(--accent);
+  background: var(--tone, var(--accent));
   transform: rotate(45deg);
 }
 
@@ -248,7 +253,7 @@ body {
 .pip.is-rolled {
   box-sizing: border-box;
   background: transparent;
-  border: 1.5px solid var(--accent);
+  border: 1.5px solid var(--tone, var(--accent));
 }
 
 /* A gear mod: an optional attribute, so an outlined pip and dimmer text. */
@@ -290,7 +295,8 @@ body {
 
 .attrs li {
   display: flex;
-  gap: 10px;
+  align-items: center;
+  gap: 7px;
   font-size: 12.5px;
   color: var(--text-dim);
 }
@@ -551,9 +557,9 @@ body {
   );
 }
 
-.tone-offensive { --tone: #e06a4a; }
-.tone-defensive { --tone: #4a90c4; }
-.tone-skill { --tone: #c9a227; }
+.tone-offensive { --tone: var(--t-offensive); }
+.tone-defensive { --tone: var(--t-defensive); }
+.tone-skill { --tone: var(--t-skill); }
 
 .item-head {
   display: flex;

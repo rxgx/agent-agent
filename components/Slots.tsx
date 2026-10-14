@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { BRANDS_BY_ID } from "@/data/brands";
-import { BRAND_MARKS, GEAR_SET_MARKS } from "@/lib/brandMarks";
+import { BRAND_MARKS, GEAR_SET_MARKS, classifyLine } from "@/lib/brandMarks";
 import { GEAR_SETS_BY_ID } from "@/data/gearSets";
 import { SKILL_PLATFORMS_BY_ID } from "@/data/skills";
 import { WEAPON_CORES } from "@/data/weaponAttributes";
@@ -61,11 +61,19 @@ const SlotShell = ({
   </article>
 );
 
+/** Tints an attribute's pip red, blue or yellow by what it does; an attribute
+ *  no vocabulary claims keeps the untinted pip. */
+const toneClass = (name: string) => {
+  const tone = classifyLine(name);
+  return tone ? ` tone-${tone}` : "";
+};
+
 const AttributeList = ({ items }: { items?: readonly Attribute[] }) =>
   items && items.length > 0 ? (
     <ul className="attrs">
       {items.map((attr) => (
         <li key={attr.name}>
+          <span className={`pip${toneClass(attr.name)}`} aria-hidden="true" />
           <span>{attr.name}</span>
           {attr.value ? <span className="v">{attr.value}</span> : null}
         </li>
@@ -74,11 +82,22 @@ const AttributeList = ({ items }: { items?: readonly Attribute[] }) =>
   ) : null;
 
 /** `rolled` marks an attribute that varies from copy to copy: an outlined pip
- *  rather than the filled one of a fixed core. */
-const Core = ({ core, rolled = false }: { core?: Attribute; rolled?: boolean }) =>
+ *  rather than the filled one of a fixed core. `toned` tints the pip by type. */
+const Core = ({
+  core,
+  rolled = false,
+  toned = false,
+}: {
+  core?: Attribute;
+  rolled?: boolean;
+  toned?: boolean;
+}) =>
   core ? (
     <div className="core">
-      <span className={`pip${rolled ? " is-rolled" : ""}`} aria-hidden="true" />
+      <span
+        className={`pip${rolled ? " is-rolled" : ""}${toned ? toneClass(core.name) : ""}`}
+        aria-hidden="true"
+      />
       <span className="core-name">{core.name}</span>
       {core.value ? <span className="core-value">{core.value}</span> : null}
     </div>
@@ -98,7 +117,7 @@ const Mods = ({ mods }: { mods?: readonly string[] }) =>
 const GearMod = ({ mod }: { mod?: string }) =>
   mod ? (
     <div className="gear-mod">
-      <span className="pip is-rolled" aria-hidden="true" />
+      <span className={`pip is-rolled${toneClass(mod)}`} aria-hidden="true" />
       <span>{mod}</span>
     </div>
   ) : null;
@@ -159,7 +178,7 @@ const GearBody = ({ piece }: { piece: GearPiece }) => {
           {subtitle ? <div className="item-sub">{subtitle}</div> : null}
         </div>
       </div>
-      <Core core={piece.core} />
+      <Core core={piece.core} toned />
       <AttributeList items={piece.attributes} />
       {piece.talent ? <div className="talent">{piece.talent}</div> : null}
       <GearMod mod={piece.mod} />

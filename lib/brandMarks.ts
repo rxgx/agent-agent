@@ -35,7 +35,7 @@ const SKILL =
   /skill (?:haste|damage|duration|efficiency|health|tier)|repair[- ]skills?|status effects?|shield health|burn duration/gi;
 
 const DEFENSIVE =
-  /armor|health|hazard protection|protection from elites|threat|regen|resistance/gi;
+  /armou?r|health|hazard protection|protection from elites|threat|regen|resistance/gi;
 
 const OFFENSIVE =
   /damage|critical|headshot|handling|magazine|mag size|reload|accuracy|stability|rate of fire|optimal range|ammo capacity|rifle|smg|lmg|shotgun|pistol|mmr/gi;
@@ -43,8 +43,11 @@ const OFFENSIVE =
 const count = (line: string, re: RegExp): number =>
   (line.match(re) ?? []).length;
 
-/** Null for a line that matches no vocabulary, so it abstains rather than voting. */
-const classifyLine = (line: string): MarkTone | null => {
+/**
+ * Null for a line that matches no vocabulary, so it abstains rather than voting.
+ * Also tints a single gear attribute, which is just a one-line bonus.
+ */
+export const classifyLine = (line: string): MarkTone | null => {
   const skill = count(line, SKILL);
   if (skill > 0) return "skill";
 
