@@ -93,6 +93,16 @@ const Mods = ({ mods }: { mods?: readonly string[] }) =>
     </ul>
   ) : null;
 
+/** A gear mod reads as an attribute, but an optional one: it sits in its own
+ *  row with the same outlined pip as a rolled attribute. */
+const GearMod = ({ mod }: { mod?: string }) =>
+  mod ? (
+    <div className="gear-mod">
+      <span className="pip is-rolled" aria-hidden="true" />
+      <span>{mod}</span>
+    </div>
+  ) : null;
+
 /** A generic piece's name is its brand or set's. */
 const sourceName = (piece: GearPiece) =>
   (piece.gearSetId ? GEAR_SETS_BY_ID.get(piece.gearSetId) : undefined)?.name ??
@@ -152,7 +162,7 @@ const GearBody = ({ piece }: { piece: GearPiece }) => {
       <Core core={piece.core} />
       <AttributeList items={piece.attributes} />
       {piece.talent ? <div className="talent">{piece.talent}</div> : null}
-      <Mods mods={piece.mod ? [piece.mod] : undefined} />
+      <GearMod mod={piece.mod} />
       <Alternates
         items={piece.alternates?.map((alt, i) => ({
           key: `${i}`,

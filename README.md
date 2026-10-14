@@ -216,6 +216,9 @@ everything else.
   and the sidearm unrecorded. Prima Donna is newer than upstream's data, so it
   comes from the local overlay in `scripts/build-data.mjs`. Its gear
   mods put Headshot Damage in every slot as specified.
+- **T10 Demolitionist Tank** was transcribed from a photo of a screenshot. Its
+  gear, weapons, talents and skills are complete; the attribute rolls and mods
+  could not be read and are left empty.
 - Alternates are not editable in the pickers; changing a slot drops them.
 - Decoy has a single variant in the data, "Holographic Distraction". Its name
   is among the Decoy, Trap and Sticky Bomb variants still to verify.
