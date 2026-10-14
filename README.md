@@ -217,8 +217,8 @@ everything else.
   comes from the local overlay in `scripts/build-data.mjs`. Its gear
   mods put Headshot Damage in every slot as specified.
 - **T10 Demolitionist Tank** was transcribed from a photo of a screenshot, so
-  it is mostly empty: five gear brands, the primary, the sidearm, the first
-  skill and all talents could not be read. Its notes record what the photo
+  it is mostly empty: five gear brands, the sidearm, the first skill and all
+  talents could not be read. Its notes record what the photo
   does show (cores, mod slots, a shared brand logo) so it can be finished from
   a sharper image.
 - Alternates are not editable in the pickers; changing a slot drops them.
