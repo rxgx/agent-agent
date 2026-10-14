@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "id": "t10-demolitionist-tank",
+  "loadout": {
+    "name": "T10 Demolitionist Tank",
+    "specializationId": "demolitionist",
+    "gear": [
+      {
+        "slot": "holster",
+        "rarity": "highEnd",
+        "brandId": "5-11-tactical",
+        "core": {
+          "name": "Skill Tier"
+        }
+      }
+    ],
+    "weapons": [
+      {
+        "slot": "secondary",
+        "name": "Sweet Dreams",
+        "type": "Shotgun",
+        "rarity": "exotic",
+        "talent": "Sandman"
+      }
+    ],
+    "skills": [
+      {
+        "platformId": "turret",
+        "variant": "Artillery"
+      }
+    ],
+    "notes": "Transcribed from a phone photo of a Reddit screenshot (\"this dude tanked a T10 for us\"), so only what the photo shows clearly is recorded. Everything else is left empty rather than guessed.\n\nCores: Armor on the mask, backpack and chest; Skill Tier on the gloves, holster and kneepads. The mask, backpack and chest each carry a mod.\n\nStill to identify: the brands of the mask, backpack, chest, gloves and kneepads (the backpack, gloves and kneepads share one logo, so likely three pieces of one brand), the primary (a long rifle), the sidearm (a pistol), the first skill (possibly a Shield), and all talents and attributes.\n\nThe original is heavily invested in Quantum Prototype upgrades, which this view does not record."
+  }
+}

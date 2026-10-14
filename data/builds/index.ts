@@ -16,10 +16,12 @@ import { alternateLoadouts, findViolations } from "@/lib/equipRules";
 import ironWillHotshot from "./iron-will-hotshot.json";
 import ninjabikeWildcardDemo from "./ninjabike-wildcard-demo.json";
 import stElmosRedStriker from "./st-elmos-red-striker.json";
+import t10DemolitionistTank from "./t10-demolitionist-tank.json";
 
 const FILES: ReadonlyArray<readonly [string, unknown]> = [
   ["st-elmos-red-striker.json", stElmosRedStriker],
   ["iron-will-hotshot.json", ironWillHotshot],
+  ["t10-demolitionist-tank.json", t10DemolitionistTank],
   ["ninjabike-wildcard-demo.json", ninjabikeWildcardDemo],
 ];
 
